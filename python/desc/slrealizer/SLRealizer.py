@@ -1,11 +1,80 @@
+import plotting
+import pandas as pd
+import matplotlib.pyplot as plt
+import pylab
+import matplotlib
+
 class SLRealizer(object):
     '''
-    Example class for SLRealizer package.
+    Worker class for SLRealizer package.
     '''
-    def __init__(self, message):
-        self.message = message
+    def __init__(self, lens=None,
+                 observation="../../data/twinkles_observation_history.csv"):
+        """
+        Reads in a lens sample catalog and observation data.
+        We assume lenses are OM10 lenses and observation file is .csv file.
+        """
+        self.lens = lens
+        self.observation = observation
+        self.currObs = None
+        self.currLens = None
+        self.obsHist = pd.read_csv(observation,index_col=0).as_matrix()
 
-    def run(self, raise_error=False):
-        if raise_error:
-            raise RuntimeError()
-        return self.message
+    def plot_random_lens_date(lensID = 7176527):
+        import random
+        randomIndex = random.randint(0, 200)
+        if(self.observation[randomIndex][1]!='y'):
+            self.currObs = self.observation[randomIndex]
+            self.currLens = self.lens.get_lens(lensID)
+            #obsHist has MJD Filter FWHM 5sigmag
+            filterQuasar = self.currObs[1] + '_SDSS_quasar'
+            filterLens = self.currObs[1] + '_SDSS_lens'
+            lens_mag = self.currLens[filterLens]
+            quasar_mag = self.currLens[filterQuasar]
+            mag_ratio = math.pow(2.5, -lens_mag+quasar_mag)
+            if(mag_ratio>1):
+                quasar_alpha = 1/mag_ratio
+                lens_alpha = 1
+            else:
+                quasar_alpha = 1
+                lens_alpha = mag_ratio
+            scale_factor = 2
+            sourceX = self.lens['XSRC'][0]
+            sourceY = self.lens['YSRC'][0]
+            lensX = self.lens['XIMG'][0]
+            lensY = self.lens['YIMG'][0]
+            if (abs(lensX[0]+sourceX))>(abs(sourceX)):
+                plotX = abs(lensX[0]+sourceX)
+            else:
+                plotX = abs(sourceX)
+            if (abs(lensY[0]+sourceY))>(abs(sourceY)):
+                plotY = abs(lensY[0]+sourceY)
+            else:
+                plotY = abs(sourceY)
+                fig = plt.figure(figsize=(4, 16))
+            for i in range(4):
+                if(obsHist[1]=='g'):
+                    circleColor = 'g'
+                else:
+                    circleColor = 'r'
+                plotNumStr = "4"+"1"+str(i+1)
+                plotNum = int(plotNumStr)
+                sub = fig.add_subplot(plotNum)
+                sub.set_ylim(-plotY-2*obsHist[2]/scale_factor, plotY+2*obsHist[2]/scale_factor)
+                sub.set_xlim(-plotX-2*obsHist[2]/scale_factor, plotX+2*obsHist[2]/scale_factor)
+                source = plt.Circle((sourceX, sourceY), radius=obsHist[2]/scale_factor, alpha=quasar_alpha, fc=circleColor, linewidth=0)
+                lens = plt.Circle((lensX[i]+sourceX, lensY[i]+sourceY), radius=obsHist[2]/scale_factor, alpha=lens_alpha, fc=circleColor, linewidth=0)
+                fig.gca().add_patch(lens)
+                fig.gca().add_patch(source)
+                sub.set_title('Observation ' + str(i+1) + ' with ' + 'filter ' + obsHist[1])
+                seeing = plt.Circle(((-plotY-2*obsHist[2])/scale_factor, (plotX-2*obsHist[2])/scale_factor), radius=obsHist[2]/scale_factor, alpha=0.1, fc='k')
+                sub.legend((source, seeing, lens),('source', 'seeing', 'lens'))
+                plt.gca().add_patch(seeing)
+            else:
+                plot_random_lens()
+
+    def seeingToSig(seeing):
+        return seeing / np.sqrt(8 * np.log(2))
+
+    def sigmaTofwhm(sigma):
+        return sigma * np.sqrt(8 * np.log(2))
