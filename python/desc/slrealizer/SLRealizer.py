@@ -39,11 +39,9 @@ class SLRealizer(object):
                                       'i': np.count_nonzero(filter=='i'),
                                       'z': np.count_nonzero(filter=='z')}
 
-    def plot_lens_random_date(self, lensID=None, debug=False, convolve=False):
-        """
-        Given a specific lens, this code plots a lens after choosing a random observation epoch.
-        """
-
+    def plot_lens_random_date(self, lensID=None, convolve=False):
+        """                                                                                                                      
+                Given a specific lens, this code plots a lens after choosing a random observation epoch.                                           """
         if lensID is None:
             print 'No lens system selected for plotting.'
             return
@@ -55,7 +53,7 @@ class SLRealizer(object):
         # Now visualize the lens system at the epoch defined by the randomIndex:
         desc.slrealizer.draw_model(self.observation[randomIndex],
                                    self.catalog.get_lens(lensID),
-                                   convolve, debug)
+                                   convolve)
         return
 
     # after merging, change this one to deblend_test
