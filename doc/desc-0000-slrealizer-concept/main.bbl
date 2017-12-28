@@ -1,0 +1,39 @@
+\begin{thebibliography}{}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{{Auger} {et~al.}(2010){Auger}, {Treu}, {Bolton}, {Gavazzi},
+  {Koopmans}, {Marshall}, {Moustakas}, \& {Burles}}]{Treu2010}
+{Auger}, M.~W., {Treu}, T., {Bolton}, A.~S., {et~al.} 2010, \apj, 724, 511
+
+\bibitem[{{Gavazzi} {et~al.}(2014){Gavazzi}, {Marshall}, {Treu}, \&
+  {Sonnenfeld}}]{RINGFINDER}
+{Gavazzi}, R., {Marshall}, P.~J., {Treu}, T., \& {Sonnenfeld}, A. 2014, \apj,
+  785, 144
+
+\bibitem[{{Ivezic}(2008)}]{LSST_overall}
+{Ivezic}, Z. 2008, ArXiv e-prints, arXiv:0805.2366
+
+\bibitem[{{LSST Dark Energy Science Collaboration}(2012)}]{DESC_overall}
+{LSST Dark Energy Science Collaboration}. 2012, ArXiv e-prints, arXiv:1211.0310
+
+\bibitem[{{LSST Science Collaboration}(2009)}]{LSSTScienceBookv2}
+{LSST Science Collaboration}. 2009, ArXiv e-prints, arXiv:0912.0201
+
+\bibitem[{{LSST Science Collaboration}(2017)}]{Twinkles}
+---. 2017, {https://github.com/LSSTDESC/Twinkles}
+
+\bibitem[{{Petrillo} {et~al.}(2017){Petrillo}, {Tortora}, {Chatterjee},
+  {Vernardos}, {Koopmans}, {Verdoes Kleijn}, {Napolitano}, {Covone},
+  {Schneider}, {Grado}, \& {McFarland}}]{convolution_neural_network}
+{Petrillo}, C.~E., {Tortora}, C., {Chatterjee}, S., {et~al.} 2017, ArXiv
+  e-prints, arXiv:1702.07675
+
+\bibitem[{{Pourrahmani} {et~al.}(2017){Pourrahmani}, {Nayyeri}, \&
+  {Cooray}}]{LensExtractor}
+{Pourrahmani}, M., {Nayyeri}, H., \& {Cooray}, A. 2017, ArXiv e-prints,
+  arXiv:1705.05857
+
+\bibitem[{{Treu} \& {Marshall}(2016)}]{TimeDelayOverall}
+{Treu}, T., \& {Marshall}, P.~J. 2016, \aapr, 24, 11
+
+\end{thebibliography}

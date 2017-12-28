@@ -1,32 +1,26 @@
-language: cpp
-os: linux
-sudo: required
-dist: trusty
-compiler: gcc
+language: python
+
+python:
+    - 2.7
+
+before_install:
+    # Non-pip dependency for cffi
+    - sudo apt-get install -y libffi-dev
+
+    # Add appropriate directories to various paths.
+    - export PYHOME=$HOME/virtualenv/python${TRAVIS_PYTHON_VERSION}
+    - export PYTHONPATH=$PYHOME/lib/python$TRAVIS_PYTHON_VERSION/site-packages/:$PYTHONPATH
+    - export PATH=$HOME/bin:$PYHOME/bin:$PATH
+    - export LD_LIBRARY_PATH=$HOME/lib:$LD_LIBRARY_PATH
 
 install:
-  - travis_wait 30 ./setup/travis_install.sh lsst-sims nose pandas pylint
-#  - ln -sf /home/travis/miniconda/lib/libssl.so.1.0.0 /home/travis/miniconda/lib
-#/libssl.so.10
-#  - ln -sf /home/travis/miniconda/lib/libcrypto.so.1.0.0 /home/travis/miniconda/
-#lib/libcrypto.so.10
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - source eups-setups.sh
-  - pip install coveralls
-  - setup lsst_sims
-  - eups declare -r . slrealizer -t current
-  - setup slrealizer
-  - scons
-
+    - pip install -r requirements.txt
+    
 cache:
-  directories:
-  - $HOME/miniconda.tarball
-  timeout: 600
+    - pip: true
 
-script:
-  - nosetests --with-coverage --cover-package=desc.slrealizer
-#  - pylint --py3k `find . -name \*.py -print`
-#  - pylint --rcfile=.pylintrc `find . -name \*.py -print`
+script: 
+    - "python python/setup.py develop && nosetests -w tests/"
 
 after_success:
-  - coveralls
+    - codecov

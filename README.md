@@ -1,4 +1,7 @@
-# SLRealizer
+<img src="https://i.imgur.com/SHvdUMe.png" width="150" href="https://github.com/jennykim1016/SLRealizer/">
+
+<a href='https://travis-ci.org/jennykim1016/SLRealizer'>
+<img src='https://secure.travis-ci.org/jennykim1016/SLRealizer.png?branch=master'></a>
 
 Catalog-level simulation of LSST DM stack measurements of
 gravitationally-lensed quasars.
@@ -28,11 +31,37 @@ To run the tests, do
 nosetests
 ```
 
-
 ## Demo
 
-Watch this space!
+* [Script to generate the source and the object catalog](https://github.com/jennykim1016/SLRealizer/blob/master/python/desc/slrealizer/script.py)
+* [Null-deblending demo with SLRealizer](https://github.com/jennykim1016/SLRealizer/blob/master/notebooks/Null_Deblend_Demo.ipynb)
+* [Feature Comparison between SDSS and OM10](https://github.com/jennykim1016/SLRealizer/blob/master/notebooks/SDSSvsOM10.ipynb)
+* [Classification of lensed systems](https://github.com/jennykim1016/SLRealizer/blob/master/notebooks/Scikit_Classifying_Lensed_Systems.ipynb)
 
+
+## Repository Structure
+
+```
+SLRealizer/
+├── python/
+│   ├── desc/
+|   |    └── slrealizer/
+|   |    |   ├── __init__.py
+|   |    |   ├── SLRealizer.py // contains wrapper methods that ensembles the methods in different modules
+|   |    |   ├── null_deblend.py // contains methods that null-deblends the input sources
+|   |    |   ├── catalog.py // contains methods that format each entree of the source and the object catalog
+|   |    |   ├── constant.py // defines constants that could be accessed globally in the package
+|   |    |   ├── dropbox_manage.py // contains methods that sync dropbox repository with a local repository to save big data
+|   |    |   ├── test.py // contains unit tests for the SLRealizer package
+|   |    |   ├── plotting.py // _not called by SLRealizer.py_ given an OM10 system, make a simple plot of gaussian realization
+|   |    |   ├── distance.py // _not yet used by SLRealizer.py_ calculate the image distance and evaluate the cost model
+|   |    |   └── Makefile // _to be more updated_ currently, contains `make clean` that cleans up the junk files
+│   └── setup.py
+└── data/
+    ├── qso_mock.fits // OM10 catalog
+    ├── sdss_object.csv // SDSS object catalog, used to compare the features between OM10 and sdss
+    └── twinkles_observation_history.csv // mock observation data
+```
 
 ## People
 * [Phil Marshall](https://github.com/LSSTDESC/SLRealizer/issues/new?body=@drphilmarshall) (SLAC)

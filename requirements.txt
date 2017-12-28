@@ -1,0 +1,8 @@
+numpy
+nose
+scikit-learn
+astropy
+matplotlib
+corner
+om10
+scipy
