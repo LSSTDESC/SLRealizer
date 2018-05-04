@@ -1,21 +1,28 @@
 """
-script that runs to generate toy catalogs
+Script that runs to generate toy catalogs
 """
 
 import lenspop
 import om10
 import desc.slrealizer
 import format_sdss_to_om10
+import time
 
 # initialize om10
 db = om10.DB(vb=False, catalog='../../../data/qso_mock.fits')
 # we select LSST-like lenses by quering with these values
-db.select_random(maglim=23.3,area=20000.0,IQ=0.75)
+db.select_random(maglim=23.3,area=5000.0,IQ=0.75)
 # calculate the synthetic magnitude for the OM10 catalog -- need this
 db.paint(synthetic=True)
 # calculate the sizes for the OM10 catalog -- if you want to assume the point-source-like-galaxies, get rid of this
-db.calculate_size()
+#db.calculate_size()
 # initialize realizer
-realizer = desc.slrealizer.SLRealizer(catalog=db, observation="../../../data/twinkles_observation_history.csv")
-realizer.make_source_catalog(dir='../../../data/source_catalog_galsim_noise_perfect.csv')
-realizer.make_object_catalog(source_table_dir='../../../data/source_catalog_galsim_noise_perfect.csv', save_dir='../../../data/object_catalog_galsim_noise_perfect.csv')
+realizer = desc.slrealizer.SLRealizer(catalog=db, observation='../../../data/twinkles_observation_history.csv')
+t0 = time.time()
+realizer.make_source_catalog(save_dir='../../../data/source_catalog_galsim_noise_perfect.csv')
+t1 = time.time()
+print("Making the source catalog took %f seconds." %(t1-t0))
+realizer.make_object_catalog(source_table_dir='../../../data/source_catalog_galsim_noise_perfect.csv',
+                             save_dir='../../../data/object_catalog_galsim_noise_perfect.csv')
+t2 = time.time()
+print("Making the object catalog took %f seconds." %(t2-t1))

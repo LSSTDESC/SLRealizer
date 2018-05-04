@@ -13,7 +13,8 @@ import math
 class TestCase(unittest.TestCase):
     
     """
-    Tests SLRealizer class.
+    Tests the SLRealizer class.
+    
     Notes
     -----
     Execute these tests with:

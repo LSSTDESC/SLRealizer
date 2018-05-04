@@ -1,15 +1,11 @@
 #=========================================
-
 import desc.slrealizer
-import scipy
 import scipy.stats
-
 #=========================================
 
 """
 This file can be used to calculate the statistical distances between two images (to be exact, two images arrays)
 """
-
 
 def chi_square_distance(image1, image2):
     """
@@ -19,7 +15,6 @@ def chi_square_distance(image1, image2):
     chi2, p, dof, ex = scipy.stats.chi2_contingency(image1, image2)
     print('chi squared: ', chi2, 'p: ', p)
     return chi2, p
-
 
 def KL_distance(image1, image2):
     """
