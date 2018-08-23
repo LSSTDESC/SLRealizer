@@ -119,7 +119,7 @@ $(DESCTEX):
 #change the compiler call to allow a "." file
 # {% raw %}
 $(main) : $(DESCTEX) authlist
-	STYLEFLAG=$(envflag) latexmk $(main)
+	STYLEFLAG=$(envflag) latexmk -f $(main)
 #	latexmk -g -pdf  \
 	-pdflatex='openout_any=a pdflatex %O -interaction=nonstopmode "${flag}\input{%S}"'  \
 	${main}
