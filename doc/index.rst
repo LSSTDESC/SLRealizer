@@ -1,7 +1,7 @@
-``SLRealizer``
-==============
+SLRealizer
+==========
 
-Contents:
+**Contents:**
 
 .. toctree::
     :maxdepth: 2
@@ -33,9 +33,8 @@ Realizing Non-Lenses: SDSS Galaxies
     :undoc-members:
 
 
-Using ``SLRealizer``
---------------------
-
+Using SLRealizer
+----------------
 
 .. automodule:: make_lens_source_object
     :members:
