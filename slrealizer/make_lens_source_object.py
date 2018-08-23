@@ -6,16 +6,25 @@ import os, sys
 from om10 import DB
 import pandas as pd
 import numpy as np
-realizer_path = os.path.join(os.environ['SLREALIZERDIR'], 'slrealizer')
-sys.path.insert(0, realizer_path)
-from realize_om10 import OM10Realizer
+
+# PJM: if slrealizer package is installed, we should not need to
+# adjust the sys.path here:
+# realizer_path = os.path.join(os.environ['SLREALIZERDIR'], 'slrealizer')
+# sys.path.insert(0, realizer_path)
+
+# PJM: use slrealizer package:
+# from realize_om10 import OM10Realizer
+from slrealizer import OM10Realizer
 
 if __name__=='__main__':
     """
     An annotated version of this script can be found in
     demo/Example+SLRealizer+Usage.ipynb.
     """
-    data_path = os.path.join(os.environ['SLREALIZERDIR'], 'data')
+    # PJM: Avoid the need for an environment variable:
+    # data_path = os.path.join(os.environ['SLREALIZERDIR'], 'data')
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
+
     catalog_f = os.path.join(data_path, 'qso_mock.fits')
     observation_f = os.path.join(data_path, 'twinkles_observation_history.csv')
 
@@ -26,7 +35,7 @@ if __name__=='__main__':
     db.select_random(maglim=23.3, area=100.0, IQ=0.75)
     #db.select_random(maglim=23.3, area=1.e8, IQ=0.75)
     db.paint(synthetic=True)
-    
+
     obs = pd.read_csv(observation_f)\
             .query("(expMJD < 65000) & (filter != 'y')")\
             .reset_index(drop=True)
@@ -34,7 +43,7 @@ if __name__=='__main__':
 
     realizer.make_source_table_vectorized(output_source_path=output_lens_source_path,
                                           include_time_variability=True)
-    
+
     realizer.make_object_table(include_std=True,
                                source_table_path=output_lens_source_path,
                                object_table_path=output_lens_object_path)
