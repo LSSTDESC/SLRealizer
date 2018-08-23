@@ -29,7 +29,8 @@
 #
 # ======================================================================
 Lastname,Firstname,Authorname,AuthorType,Affiliation,Contribution,Email
-Kim,Jenny,"Jenny Kim",Contact,"Kavli Institute for Particle Astrophysics \& Cosmology, P. O. Box 2450, Stanford University, Stanford, CA 94305, USA","Led algorithm and code development, wrote paper.","yeonjaek@stanford.edu "
+Kim,Jenny,"Jenny Kim",Contact,"Kavli Institute for Particle Astrophysics \& Cosmology, P. O. Box 2450, Stanford University, Stanford, CA 94305, USA","Initial algorithm and code development, wrote paper.","yeonjaek@stanford.edu "
+Park,"Ji Won","Ji Won Park",Contact,"Kavli Institute for Particle Astrophysics \& Cosmology, P. O. Box 2450, Stanford University, Stanford, CA 94305, USA","Improved algorithm and code development, edited paper.","jwp@stanford.edu "
 Marshall,Phil,Phil~Marshall,Contributor,"Kavli Institute for Particle Astrophysics \& Cosmology, P. O. Box 2450, Stanford University, Stanford, CA 94305, USA","Initiated  project, advised on motivation, model construction and testing.",dr.phil.marshall@gmail.com
 Marshall,Phil,Phil~Marshall,Contributor,"SLAC National Accelerator Laboratory, Menlo Park, CA 94025, USA","Initiated  project, advised on motivation, model construction and testing.",dr.phil.marshall@gmail.com
 Baumer,Michael,Mike~Baumer,Contributor,"Kavli Institute for Particle Astrophysics \& Cosmology, P. O. Box 2450, Stanford University, Stanford, CA 94305, USA","Advised on LSST data characteristics, model construction and testing.",mbaumer@stanford.edu

@@ -43,7 +43,7 @@
 
 \begin{document}
 
-\title{\SLRealizer: LSST Catalog-level Realization of Gravitationally-lensed Quasars }
+\title{\SLRealizer: LSST Catalog-level Realization of Gravitationally-lensed Quasars. I. Initial \Object Emulation and Classification}
 
 \maketitlepre
 
@@ -52,12 +52,12 @@
 The scale of the LSST dataset will be such that, when considering the
 problem of finding lensed quasars, we should anticipate extracting as
 much information out of the the catalogs as possible before turning to
-the pixel-level data. In this work we explore the use of simple, low
+the pixel-level data. In this initial Note we explore the use of simple, low
 multiplicity Gaussian mixture models for realizing gravitational lens
 systems in LSST catalog space, to enable both large-scale data
 emulation and fast initial lens-or-not classification. We demonstrate
-the generation of toy \Source and \Object catalogs, and carry out a
-simple machine learning classification using them.
+the generation of a toy \Object catalog, and carry out a
+simple machine learning classification of it.
 
 \end{abstract}
 
@@ -300,13 +300,13 @@ object catalog can be viewed
 \label{sec:ml}
 
 We now do a simple demonstration of a machine learning lens finder
-operating on the realized LSST tables. We first derive some higher-level
+operating on the realized LSST \Object table. We first derive some higher-level
 features from the \Object table measurements, and then test several
 different off-the-shelf classification algorithms, using the \SLRealizer
 data in both the training and test sets. For non-lenses, we use a sample
 of SDSS galaxies that have the same measurements as \SLRealizer
 predicts, and whose brightnesses approximately match the realized OM10
-\Object's.
+{\Object}s.
 
 \subsection{Feature Selection}
 \label{subsec:feature}
