@@ -20,7 +20,9 @@ cache:
     - pip: true
 
 script: 
-    - "python python/setup.py develop && nosetests -w tests/"
+    - "python tests/test_analytical_moments.py"
+    - "python tests/test_om10realizer.py"
+    - "python tests/test_sdssrealizer.py"
 
 after_success:
     - codecov

@@ -1,4 +1,6 @@
 numpy
+pandas
+galsim
 nose
 scikit-learn
 astropy

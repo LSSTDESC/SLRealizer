@@ -61,6 +61,9 @@ target/
 # Ipython Notebook
 .ipynb_checkpoints
 
+# Practice Notebooks
+*/practice_notebook.ipynb
+
 # Backup files
 *~
 
@@ -79,3 +82,6 @@ attic
 # Data
 toy_object_catalog.csv
 toy_source_catalog.csv
+*.csv
+*.txt
+*.fits

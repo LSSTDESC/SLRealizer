@@ -1,7 +1,7 @@
 <img src="https://i.imgur.com/AKdUANu.png" width="150" href="https://github.com/LSSTDESC/SLRealizer/">
 
 <a href='https://travis-ci.org/LSSTDESC/SLRealizer'>
-<img src='https://secure.travis-ci.org/LSSTDESC/SLRealizer.png?branch=master'></a>
+<img src='https://secure.travis-ci.com/LSSTDESC/SLRealizer.svg?branch=master'></a>
 
 Catalog-level simulation of LSST DM stack measurements of
 gravitationally-lensed quasars.
@@ -14,6 +14,17 @@ model lenses as mixtures of Gaussians. Our goals are to
 
 2. Enable a model-based interpretation of the LSST catalogs, for use in lens finding and light curve extraction.
 
+## Required Packages
+
+1. For Ubuntu 16.04, the matplotlib.pyplot.imshow module in Jupyter Notebook requires a manual installation of `texlive-latex-base`, `texlive-latex-extra`, `texlive-fonts-recommended`, and `dvipng`.
+
+2. Astropy
+
+3. Scikit-learn
+
+4. Pandas
+
+5. Numpy
 
 ## Set-up and testing
 
@@ -40,7 +51,8 @@ nosetests
 
 ## Notes
 
-A draft LSST DESC Note describing the basic operation of `SLRealizer`, and some simple machine learning classification results, can be viewed in the `issue/17/desc-note` branch's `doc` folder [here](https://github.com/LSSTDESC/SLRealizer/tree/issue/17/desc-note/doc/slrealizer-concept-note/main.pdf).
+A draft LSST DESC Note describing the basic operation of `SLRealizer`, and some simple machine learning classification results, can be viewed in the `issue/17/desc-note` branch's `doc` folder [here](https://github.com/LSSTDESC/SLRealizer/blob/issue/17/desc-note/doc/slrealizer-concept-note/main.pdf).
+
 
 ## Repository Structure
 
@@ -68,6 +80,7 @@ SLRealizer/
 
 ## People
 * [Phil Marshall](https://github.com/LSSTDESC/SLRealizer/issues/new?body=@drphilmarshall) (SLAC)
+* [Ji Won Park] (https://github.com/LSSTDESC/SLRealizer/issues/new?body=@jiwoncpark) (Stanford)
 * [Jenny Kim](https://github.com/LSSTDESC/SLRealizer/issues/new?body=@jennykim1016) (Stanford)
 * [Mike Baumer](https://github.com/LSSTDESC/SLRealizer/issues/new?body=@mbaumer) (SLAC)
 * [Steve Kahn](https://github.com/LSSTDESC/SLRealizer/issues/new?body=@stevkahn) (SLAC)
