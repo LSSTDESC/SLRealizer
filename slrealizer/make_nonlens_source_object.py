@@ -1,5 +1,5 @@
 import os, sys
-import galsim
+# import galsim
 import pandas as pd
 import numpy as np
 

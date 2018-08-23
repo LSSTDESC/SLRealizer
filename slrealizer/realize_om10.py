@@ -2,24 +2,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from realize_sl import SLRealizer
-from utils.constants import *
-from utils.utils import *
+from slrealizer import SLRealizer
+from slrealizer.utils import *
 import numpy as np
 import pandas as pd
-import galsim
+# import galsim
 import gc # need this to optimize memory usage
 
 class OM10Realizer(SLRealizer):
 
     """
-    
+
     A class that realizes objects in the OM10 mock quasar catalog
-    under the given observation conditions, 
+    under the given observation conditions,
     into LSST DRP Source and Object catalogs
-    
+
     """
-    
+
     def __init__(self, observation, catalog, debug=False, add_moment_noise=True, add_flux_noise=True):
         #super(OM10Realizer, self).__init__(observation) # Didn't work for some reason
         self.as_super = super(OM10Realizer, self)
@@ -27,7 +26,7 @@ class OM10Realizer(SLRealizer):
         self.catalog = catalog
         self.num_systems = len(self.catalog.sample)
         self.DEBUG = debug
-        
+
     def get_lens_info(self, objID=None, rownum=None):
         if objID is not None and rownum is not None:
             raise ValueError("Need to define either objID or rownum, not both.")
@@ -40,36 +39,36 @@ class OM10Realizer(SLRealizer):
     def _om10_to_galsim(self, lens_info, band):
         """
         Converts OM10's column values into GalSim terms
-        
+
         Keyword arguments:
         lens_info -- a row of the OM10 DB
         band -- the filter used to observe
 
         Returns:
-        A dictionary (named galsimInput) containing properties that 
+        A dictionary (named galsimInput) containing properties that
         can be passed into GalSim (See code for which properties)
         """
-        
+
         # We will input flux in units of nMgy
-        mag   = lens_info[band + '_SDSS_lens'] 
+        mag   = lens_info[band + '_SDSS_lens']
         flux  = mag_to_flux(mag, to_unit='nMgy') # in nMgy
         hlr   = lens_info['REFF_T'] # REFF_T is in arcsec
         e     = lens_info['ELLIP']
         beta  = lens_info['PHIE'] * galsim.degrees # PHIE is in degrees
-        
+
         galsimInput={'flux': flux,
                      'half_light_radius': hlr,
                      'e': e,
                      'beta': beta,
                      'num_objects': lens_info['NIMG']}
-        
+
         for obj in xrange(lens_info['NIMG']):
             obj_mag = lens_info[band + '_SDSS_quasar']\
             + flux_to_mag(abs(lens_info['MAG'][obj]))
                       #+ flux_to_mag(lens_info['MAG'][obj] + get_filter_AB_offset())
             galsimInput['flux_'+str(obj)] = mag_to_flux(obj_mag, to_unit='nMgy') # don't subtract AB offset?
             galsimInput['xy_'+str(obj)] = lens_info['XIMG'][obj], lens_info['YIMG'][obj]
-            
+
         return galsimInput
 
     def _om10_to_lsst(self, obs_info, lens_info):
@@ -79,14 +78,14 @@ class OM10Realizer(SLRealizer):
         Keyword arguments:
         obs_info -- dictionary containing the observation conditions
         lens_info -- dictionary containing the lens properties
-        
+
         Returns:
-        A dictionary (named derived_params) containing properties that 
+        A dictionary (named derived_params) containing properties that
         can be used to propagate one row of the source table
         """
-        
+
         histID, MJD, band, psf_fwhm, five_sigma_depth = obs_info
-        
+
         # Initialize parameter dictionary
         numQuasars = lens_info['NIMG']
         lens_mag = lens_info[band + '_SDSS_lens']
@@ -94,13 +93,13 @@ class OM10Realizer(SLRealizer):
         q_mag_arr = lens_info[band + '_SDSS_quasar'] + flux_to_mag(np.abs(np.array(lens_info['MAG'][:numQuasars])))
         q_flux_arr = mag_to_flux(q_mag_arr, to_unit='nMgy')
         q_tot_flux = np.sum(q_flux_arr)
-        
+
         derived_params = {'psf_fwhm': psf_fwhm,
                           'lens_flux': lens_flux,
                           'apFlux': lens_flux + q_tot_flux,
                           'e': lens_info['ELLIP'],
                           'beta': lens_info['PHIE'], }
-        
+
         # Set fluxes of nonexistent quasar images to zero
         if numQuasars < 4:
             q_flux_arr[numQuasars - 1:] = 0.0
@@ -132,7 +131,7 @@ class OM10Realizer(SLRealizer):
             derived_params.pop(k, None)
 
         return derived_params
-            
+
     def draw_system(self, obs_info, lens_info, save_path=None):
         galsimInput = self._om10_to_galsim(lens_info, obs_info['filter'])
         return self.as_super.draw_system(galsimInput=galsimInput, obs_info=obs_info, save_path=save_path)
@@ -142,15 +141,15 @@ class OM10Realizer(SLRealizer):
         Performs GalSim's HSM shape estimation on the image
         rendered with lens properties in lens_info
         under the observation conditions in obs_info
-        
+
         Keyword arguments:
         obs_info -- dictionary containing the observation conditions
-        lens_info -- dictionary containing the lens properties 
-        method -- one of "hsm" (GalSim's HSM shape estimator) or 
+        lens_info -- dictionary containing the lens properties
+        method -- one of "hsm" (GalSim's HSM shape estimator) or
                   "raw_numerical" (a native numerical moment calculator) [default: "raw_numerical"]
-        
+
         Returns
-        a dictionary containing the shape information 
+        a dictionary containing the shape information
         numerically derived by HSM
         """
         galsim_img = self.draw_system(lens_info=lens_info, obs_info=obs_info, save_path=None)
@@ -162,7 +161,7 @@ class OM10Realizer(SLRealizer):
         from properties HSM derived from the image, which was in turn
         drawn from the catalog's truth properties.
         Only runs when DEBUG == True.
-        
+
         Returns
         a GalSim Image object of the emulated system
         """
@@ -180,7 +179,7 @@ class OM10Realizer(SLRealizer):
         obs_info -- a row of the observation history df
         method -- how to calculate the moments, one of "analytical", "raw_numerical", and "hsm"
                   (for details about "raw_numerical" vs. "hsm", see method estimate_parameters)
-        
+
         Returns
         A dictionary with properties derived from HSM estimation
         (See code for which properties)
@@ -203,15 +202,15 @@ class OM10Realizer(SLRealizer):
         Keyword arguments:
         output_source_path -- save path for the output source table
         include_time_variability -- whether to include intrinsic quasar variability
-        
+
         Returns (only if self.DEBUG == True):
         a Pandas dataframe of the source table
         """
         import time
-        
+
         start = time.time()
         self._preformat_source_table()
-        
+
         if include_time_variability:
             self.include_quasar_variability(save_output=False)
             self.source_table.reset_index(inplace=True)
@@ -223,10 +222,10 @@ class OM10Realizer(SLRealizer):
         # Get total flux
         q_flux_cols = ['q_flux_' + str(q) for q in range(4)]
         src['apFlux'] = src[q_flux_cols + ['lens_flux']].sum(axis=1)
-        
+
         self.source_table = src
         self._include_moments()
-        
+
         # Add flux noise
         src['apFluxErr'] = mag_to_flux(src['fiveSigmaDepth']-22.5)/5.0 # because Fb = 5 \sigma_b
         if self.add_flux_noise:
@@ -253,7 +252,7 @@ class OM10Realizer(SLRealizer):
             print("Result of making source table: ")
             print("Number of observations: ", out_num_times)
             print("Number of lenses: ", out_num_lenses)
-        
+
         src.set_index('objectId', inplace=True)
         src.to_csv(output_source_path)
         gc.collect()
@@ -270,9 +269,9 @@ class OM10Realizer(SLRealizer):
         that can be used by SLRealizer's helper functions
         """
         from astropy.table import Table, Column
-        
+
         catalogAstropy = self.catalog.sample # the Astropy table underlying OM10 object
-        
+
         #################################
         # OM10 --> Pandas DF conversion #
         #################################
@@ -295,7 +294,7 @@ class OM10Realizer(SLRealizer):
         src = catalog.merge(observation, how='left', on='key')
         src.drop('key', 1, inplace=True)
         gc.collect()
-        
+
         ##############################################
         # Rename columns and set null values to zero #
         ##############################################
@@ -308,7 +307,7 @@ class OM10Realizer(SLRealizer):
             'PHIE': 'beta',
             }, inplace=True)
         gc.collect()
-        
+
         # Set unused band magnitudes to zero, to
         # work only with the magnitude in the observed filter
         for b in 'ugriz': # b = observed filter
@@ -322,7 +321,7 @@ class OM10Realizer(SLRealizer):
         src['q_mag'] = src[qMagCols].sum(axis=1)
         src.drop(lensMagCols + qMagCols, axis=1, inplace=True)
         gc.collect()
-        
+
         # Convert magnitudes into fluxes
         src['lens_flux'] = mag_to_flux(src['lens_mag'], to_unit='nMgy')
         for q in range(4):
@@ -332,10 +331,10 @@ class OM10Realizer(SLRealizer):
         # Set fluxes of nonexistent quasar images to zero
         src.loc[src['NIMG'] == 2, ['q_flux_2', 'q_flux_3']] = 0.0
         src.loc[src['NIMG'] == 3, ['q_flux_3']] = 0.0
-        
+
         self.source_table = src
 
-        
+
 
     #def add_time_variability INHERITED
     #def make_source_table_rowbyrow INHERITED
