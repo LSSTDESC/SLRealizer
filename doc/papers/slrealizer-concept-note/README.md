@@ -1,16 +1,18 @@
 
 ### _SLRealizer Concept DESC Note_
-# LSST Catalog-level Realization of Gravitationally-lensed Quasars
+# `SLRealizer`: LSST Catalog-level Realization of Gravitationally-lensed Quasars. I. Initial `Object` Emulation and Classification}
 
-*Jenny Kim, Mike Baumer, Phil Marshall, Steve Kahn, Rahul Biswas*
+*Jenny Kim, Ji Won Park, Phil Marshall, Mike Baumer, Steve Kahn, Rahul Biswas*
 
 The scale of the LSST dataset will be such that, when considering the
 problem of finding lensed quasars, we should anticipate extracting as
 much information out of the the catalogs as possible before turning to
-the pixel-level data. In this work we explore the use of simple, low
+the pixel-level data. In this initial Note we explore the use of simple, low
 multiplicity Gaussian mixture models for realizing gravitational lens
-systems in LSST catalog space, to enable both large-scale sample
-simulation and direct model inference.
+systems in LSST catalog space, to enable both large-scale data
+emulation and fast initial lens-or-not classification. We demonstrate
+the generation of a toy Object catalog, and carry out a
+simple machine learning classification of it.
 
 ## Editing this Note
 
@@ -19,7 +21,7 @@ edit the primary file, `main.tex`, and the figures and tables in their respectiv
 
 ## Building this Note
 ```
-make main
+make all
 ```
 You can also `make clean` to remove the intermediate products.
 
