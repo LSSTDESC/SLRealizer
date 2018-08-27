@@ -21,7 +21,6 @@ before_install:
     - "pip install --user pybind11"
     # Install GalSim
     #- "pip install --user galsim"
-    - "python -c 'import galsim; galsim.__file__'"
    
 cache:
     ccache: true
