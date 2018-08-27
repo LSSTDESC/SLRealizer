@@ -32,6 +32,7 @@ install:
 
 script:
     - "python setup.py install"
+    - "python -c 'from slrealizer import data; print(data.__path__)'"
     - "cd slrealizer/tests"
     - "python test_analytical_moments.py"
     - "python test_om10realizer.py"

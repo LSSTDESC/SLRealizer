@@ -29,15 +29,16 @@ class OM10RealizerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        from slrealizer import data, tests
+        from slrealizer import data
         
         # Input catalogs
-        data_dir = data.__path__
+        data_dir = data.__path__[0]
         input_object_catalog = os.path.join(data_dir, 'test_catalog.fits')
         input_observation_catalog = os.path.join(data_dir, 'twinkles_observation_history.csv')
 
         # Output catalogs
-        output_dir = os.path.join(tests.__path__, 'test_output', 'test_om10realizer')
+        tests_dir = os.path.dirname(os.path.realpath(__file__))
+        output_dir = os.path.join(tests_dir, 'test_output', 'test_om10realizer')
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
         os.makedirs(output_dir)
