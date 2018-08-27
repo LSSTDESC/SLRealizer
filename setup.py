@@ -12,6 +12,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/LSSTDESC/SLRealizer',
     install_requires=[
+        "pybind",
         "pip==9.0.3",
         "numpy>=1.13",
         "future>=0.15",

@@ -17,10 +17,10 @@ before_install:
     - "pip install --user urllib3[secure] --upgrade"
     - "pip install --user requests[security] --upgrade"
     # GalSim dependencies
-    - "sudo apt-get install -y libfftw3-dev libav-tools libeigen3-dev cmake"
+    - "sudo apt-get install -y libfftw3-dev libav-tools libeigen3-dev cmake python-tk"
     - "pip install --user pybind11"
     # Install GalSim
-    - "pip install --user galsim"
+    #- "pip install --user galsim"
     - "python -c 'import galsim; galsim.__file__'"
    
 cache:
