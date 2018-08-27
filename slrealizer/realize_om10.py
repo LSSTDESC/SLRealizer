@@ -2,9 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from realize_sl import SLRealizer
-from utils.constants import *
-from utils.utils import *
+from slrealizer.realize_sl import SLRealizer
+from slrealizer.utils.constants import *
+from slrealizer.utils.utils import *
 import numpy as np
 import pandas as pd
 import galsim

@@ -1,4 +1,3 @@
-#from distutils.core import setup
 from setuptools import setup, find_packages
 
 setup(
@@ -6,22 +5,23 @@ setup(
     version='0.2.1',
     author='Phil Marshall',
     author_email='dr.phil.marshall@gmail.com',
-    package_dir={'':'slrealizer'},
-    packages=find_packages('slrealizer'),
+    packages=find_packages(),
     license='LICENSE.md',
     description='Catalog-level realization of simulated gravitational lenses.',
     long_description=open("README.md").read(),
     long_description_content_type='text/markdown',
     url='https://github.com/LSSTDESC/SLRealizer',
     install_requires=[
-        "galsim",
         "pip==9.0.3",
         "numpy>=1.13",
         "future>=0.15",
         "matplotlib>=2.2.2",
-        "astropy >= 2.0",
-        "pandas >= 0.20",
-        "om10"],
+        "astropy==2.0",
+        "pandas>=0.20",
+        "scikit-learn==0.19.2",
+        "corner",
+        "om10",
+        "galsim"],
     include_package_data=True,
     classifiers=[
         'Development Status :: 4 - Beta',

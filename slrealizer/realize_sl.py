@@ -3,11 +3,10 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from utils.utils import *
-from utils.constants import *
+from slrealizer.utils.utils import *
+from slrealizer.utils.constants import *
 import pandas as pd
 import random
-import om10
 import galsim
 
 class SLRealizer(object):

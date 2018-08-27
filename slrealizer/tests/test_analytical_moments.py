@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import galsim
 import unittest
 import numpy as np
 import os, sys
-realizer_path = os.path.join(os.environ['SLREALIZERDIR'], 'slrealizer')
-sys.path.insert(0, realizer_path)
-from utils.utils import *
+from slrealizer.utils.utils import *
 
 class AnalyticalTest(unittest.TestCase):  
     """Tests the analytical equations used for calculating moments."""

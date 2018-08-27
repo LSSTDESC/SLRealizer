@@ -1,21 +1,16 @@
-# *-* encoding: utf-8 *-*
-# Unit tests for OM10Realizer functions
-
-# ======================================================================
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
+
 import unittest
-from om10 import DB
-import os
+import os, sys
 import shutil
 import pandas as pd
 import numpy as np
 
-import sys
-realizer_path = os.path.join(os.environ['SLREALIZERDIR'], 'slrealizer')
-sys.path.insert(0, realizer_path)
-from realize_om10 import OM10Realizer
-from utils.utils import *
-# ======================================================================
+from om10 import DB
+from slrealizer.realize_om10 import OM10Realizer
+from slrealizer.utils.utils import *
 
 class OM10RealizerTest(unittest.TestCase):
 

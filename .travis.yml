@@ -10,27 +10,17 @@ compiler:
     - g++
 
 before_install:
-    # Add appropriate directories to various paths.
-    #- "export PYHOME=$HOME/virtualenv/python${TRAVIS_PYTHON_VERSION}"
-    #- export PYTHONPATH=$PYHOME/lib/python$TRAVIS_PYTHON_VERSION/site-packages/:$PYTHONPATH
-    #- export PATH=$HOME/bin:$PYHOME/bin:$PATH
-    - "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/lib"
-    - "export LIBRARY_PATH=$LIBRARY_PATH:$HOME/.local/lib"
-    - "echo $LD_LIBRARY_PATH"
-    - "echo $LIBRARY_PATH"
-    #- "export PIP_TARGET=$PYHOME/include/python$TRAVIS_PYTHON_VERSION{a:0:3}"
-
     - "sudo apt-get -qq update"
     # Non-pip dependency
     - "sudo apt-get install -y libffi-dev libssl-dev python-dev"
-    - "sudo pip install --user pyOpenSSL ndg-httpsclient pyasn1"
-    - "sudo pip install --user urllib3[secure] --upgrade"
-    - "sudo pip install --user requests[security] --upgrade"
+    - "pip install --user pyOpenSSL ndg-httpsclient pyasn1"
+    - "pip install --user urllib3[secure] --upgrade"
+    - "pip install --user requests[security] --upgrade"
     # GalSim dependencies
     - "sudo apt-get install -y libfftw3-dev libav-tools libeigen3-dev cmake"
-    - "sudo pip install --user pybind11"
+    - "pip install --user pybind11"
     # Install GalSim
-    - "sudo pip install --user galsim"
+    - "pip install --user galsim"
     - "python -c 'import galsim; galsim.__file__'"
    
 cache:
@@ -38,15 +28,13 @@ cache:
     pip: true
 
 install:
-    # SLRealizer dependencies
-    - "sudo pip install --user -r requirements.txt"
+    # Install SLRealizer dependencies
+    - "pip install --user -r requirements.txt"
 
 script:
-    - "python -c 'import galsim; galsim.__file__'"
-    - "python -c 'import numpy; numpy.__file__'"
     - "python setup.py install"
+    - "python -c 'import matplotlib; matplotlib.__file__'"
     - "pwd"
-    - "source configure.sh"
     - "cd slrealizer/tests"
     - "python test_analytical_moments.py"
     - "python test_om10realizer.py"
