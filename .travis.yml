@@ -32,12 +32,10 @@ install:
 
 script:
     - "python setup.py install"
-    - "pwd"
     - "cd slrealizer/tests"
     - "python test_analytical_moments.py"
     - "python test_om10realizer.py"
     - "python test_sdssrealizer.py"
-    - "pwd"
 
 after_success:
     - codecov

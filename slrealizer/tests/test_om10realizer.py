@@ -8,6 +8,9 @@ import shutil
 import pandas as pd
 import numpy as np
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from om10 import DB
 from slrealizer.realize_om10 import OM10Realizer
 from slrealizer.utils.utils import *
