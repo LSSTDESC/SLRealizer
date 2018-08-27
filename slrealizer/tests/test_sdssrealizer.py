@@ -10,7 +10,6 @@ import numpy as np
 
 from slrealizer.realize_sdss import SDSSRealizer
 from slrealizer.utils.utils import *
-# ======================================================================
 
 class SDSSRealizerTest(unittest.TestCase):
 
@@ -26,13 +25,16 @@ class SDSSRealizerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        import pkg_resources
+        from slrealizer import data, tests
+        
         # Input catalogs
-        data_dir = os.path.join(os.environ['SLREALIZERDIR'], 'data')
+        data_dir = data.__path__
         input_object_catalog = os.path.join(data_dir, 'sdss_processed.csv')
         input_observation_catalog = os.path.join(data_dir, 'twinkles_observation_history.csv')
 
         # Output catalogs
-        output_dir = os.path.join(os.environ['SLREALIZERDIR'], 'tests', 'test_output', 'test_sdssrealizer')
+        output_dir = os.path.join(tests.__path__, 'test_output', 'test_sdssrealizer')
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)
         os.makedirs(output_dir)
