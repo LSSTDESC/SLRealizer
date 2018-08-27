@@ -3,6 +3,9 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import matplotlib
+import matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from slrealizer.utils.utils import *
 from slrealizer.utils.constants import *
 import pandas as pd
@@ -12,7 +15,7 @@ import galsim
 class SLRealizer(object):
 
     """
-    
+   
     Class equipped with utility functions
     for making the LSST-like object and source tables
     inherited by child classes which are associated with a specific non-LSST catalog, 

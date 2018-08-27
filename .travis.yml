@@ -17,7 +17,7 @@ before_install:
     - "pip install --user urllib3[secure] --upgrade"
     - "pip install --user requests[security] --upgrade"
     # GalSim dependencies
-    - "sudo apt-get install -y libfftw3-dev libav-tools libeigen3-dev cmake python-tk"
+    - "sudo apt-get install -y libfftw3-dev libav-tools libeigen3-dev cmake"
     - "pip install --user pybind11"
     # Install GalSim
     #- "pip install --user galsim"
@@ -33,7 +33,6 @@ install:
 
 script:
     - "python setup.py install"
-    - "python -c 'import matplotlib; matplotlib.__file__'"
     - "pwd"
     - "cd slrealizer/tests"
     - "python test_analytical_moments.py"
