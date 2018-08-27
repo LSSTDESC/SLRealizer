@@ -3,9 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import matplotlib
-import matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 from slrealizer.utils.utils import *
 from slrealizer.utils.constants import *
 import pandas as pd
