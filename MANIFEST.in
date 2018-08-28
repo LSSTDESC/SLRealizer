@@ -1,3 +1,4 @@
 include *.fits
 include *.csv
 include *.md
+include *.rst

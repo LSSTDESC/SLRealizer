@@ -29,8 +29,10 @@ class SDSSRealizerTest(unittest.TestCase):
         
         # Input catalogs
         data_dir = data.__path__[0]
-        input_object_catalog = os.path.join(data_dir, 'sdss_processed.csv')
-        input_observation_catalog = os.path.join(data_dir, 'twinkles_observation_history.csv')
+        #input_object_catalog = os.path.join(data_dir, 'sdss_processed.csv')
+        #input_observation_catalog = os.path.join(data_dir, 'twinkles_observation_history.csv')
+        input_object_catalog = "https://www.dropbox.com/s/74moqzb5zhzmmiq/sdss_processed.csv?dl=1"
+        input_observation_catalog = "https://www.dropbox.com/s/2fgjk6ip69d64kb/twinkles_observation_history.csv?dl=1"
 
         # Output catalogs
         tests_dir = os.path.dirname(os.path.realpath(__file__))
