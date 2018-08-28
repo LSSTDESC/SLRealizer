@@ -1,4 +1,2 @@
-include *.fits
-include *.csv
-include *.md
-include *.rst
+include slrealizer/data/test_catalog.fits
+global-include *.rst *.md
