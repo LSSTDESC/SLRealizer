@@ -7,6 +7,6 @@ pandas>=0.20
 scikit-learn==0.19.2
 corner
 git+git://github.com/drphilmarshall/lenspop.git#egg=lenspop
-om10
+git+git://github.com/drphilmarshall/om10.git#egg=om10
 galsim
 
