@@ -86,7 +86,7 @@ class SLRealizer(object):
                        .shear(e=galsimInput['e'], beta=galsimInput['beta'])
         # Lensed quasar
         for i in xrange(galsimInput['num_objects']):
-            lens = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=0.0)\
+            lens = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=1.0)\
                          .shift(galsimInput['xy_'+str(i)])
             galaxy += lens
             
