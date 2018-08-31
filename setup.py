@@ -21,8 +21,6 @@ setup(
         "pandas>=0.20",
         "scikit-learn==0.19.2",
         "corner",
-        "lenspop",
-        "om10",
         "galsim"],
     include_package_data=True,
     classifiers=[
