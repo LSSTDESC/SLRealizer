@@ -80,19 +80,18 @@ class SLRealizer(object):
         '''
         histID, MJD, band, PSF_FWHM, sky_mag = obs_info
 
-        # Lens galaxy
-        galaxy = galsim.Gaussian(half_light_radius=galsimInput['half_light_radius'],\
-                                 flux=galsimInput['flux'])\
+        # Lens galaxy #half_light_radius=galsimInput['half_light_radius'],\
+        galaxy = galsim.Gaussian(sigma=1.0, flux=galsimInput['flux'])\
                        .shear(e=galsimInput['e'], beta=galsimInput['beta'])
         # Lensed quasar
         for i in xrange(galsimInput['num_objects']):
-            lens = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=1.0)\
+            quasar = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=0.0)\
                          .shift(galsimInput['xy_'+str(i)])
-            galaxy += lens
+            galaxy += quasar
             
         psf = galsim.Gaussian(flux=1.0, fwhm=PSF_FWHM)
         galsim_obj = galsim.Convolve([galaxy, psf], gsparams=self.fft_params)
-        galsim_img = galsim_obj.drawImage(nx=self.nx, ny=self.ny, scale=self.pixel_scale)
+        galsim_img = galsim_obj.drawImage(nx=self.nx, ny=self.ny, scale=self.pixel_scale, method='no_pixel')
         if save_path is not None:
             plt.imshow(galsim_img.array, interpolation='none', aspect='auto')
             plt.savefig(save_path)
