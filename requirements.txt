@@ -6,6 +6,6 @@ astropy==2.0
 pandas>=0.20
 scikit-learn==0.19.2
 corner
-git+https://github.com/drphilmarshall/lenspop.git@master
-git+https://github.com/drphilmarshall/om10.git@master
+#git+git://github.com/drphilmarshall/lenspop.git@master#egg=lenspop
+git+git://github.com/jiwoncpark/om10.git@master#egg=lenspop
 galsim
