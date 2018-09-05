@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from om10 import DB
-from slrealizer.realize_om10 import OM10Realizer
+from slrealizer import OM10Realizer
 from slrealizer.utils.utils import *
 
 class OM10RealizerTest(unittest.TestCase):

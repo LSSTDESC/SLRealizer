@@ -8,7 +8,7 @@ import shutil
 import pandas as pd
 import numpy as np
 
-from slrealizer.realize_sdss import SDSSRealizer
+from slrealizer import SDSSRealizer
 from slrealizer.utils.utils import *
 
 class SDSSRealizerTest(unittest.TestCase):

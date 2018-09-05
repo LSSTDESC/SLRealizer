@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from slrealizer.realize_sl import SLRealizer
+from slrealizer import SLRealizer
 from slrealizer.utils.constants import *
 from slrealizer.utils.utils import *
 import numpy as np
