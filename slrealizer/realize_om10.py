@@ -281,7 +281,7 @@ class OM10Realizer(SLRealizer):
         saveCols = lensMagCols + qMagCols + ['REFF_T', 'NIMG', 'LENSID', 'ELLIP', 'PHIE']
         saveValues = [catalogAstropy[c] for c in saveCols]
         saveColDict = dict(zip(saveCols, saveValues))
-        collapsedColDict = get_1D_columns(multidimColNames=['MAG', 'XIMG', 'YIMG'], table=catalogAstropy)
+        collapsedColDict = utils.get_1D_columns(multidimColNames=['MAG', 'XIMG', 'YIMG'], table=catalogAstropy)
         saveColDict.update(collapsedColDict)
         catalog = Table(saveColDict.values(), names=saveColDict.keys()).to_pandas()
         catalog.drop_duplicates('LENSID', inplace=True)

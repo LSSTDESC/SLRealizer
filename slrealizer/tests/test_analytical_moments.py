@@ -4,7 +4,7 @@ import galsim
 import unittest
 import numpy as np
 import os, sys
-from slrealizer.utils.utils import e1e2_to_ephi, get_first_moments_from_image, get_second_moments_from_image
+import slrealizer.utils.utils as utils
 
 class AnalyticalTest(unittest.TestCase):  
     """Tests the analytical equations used for calculating moments."""
@@ -51,7 +51,7 @@ class AnalyticalTest(unittest.TestCase):
         galsim_img = gal.drawImage(scale=self.pixel_scale, nx=self.nx, ny=self.nx, method='no_pixel')
 
         # Analytical
-        e, phi = e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
+        e, phi = utils.e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
         q = np.sqrt((1.0-e)/(1.0+e))
         lam1 = self.gal_sigma**2.0/q
         lam2 = self.gal_sigma**2.0*q
@@ -82,7 +82,7 @@ class AnalyticalTest(unittest.TestCase):
         galsim_img = total.drawImage(scale=self.pixel_scale, nx=self.nx, ny=self.nx, method='no_pixel')
         
         # Analytical
-        e, phi = e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
+        e, phi = utils.e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
         q = np.sqrt((1.0-e)/(1.0+e))
         lam1 = self.gal_sigma**2.0/q
         lam2 = self.gal_sigma**2.0*q
@@ -98,10 +98,10 @@ class AnalyticalTest(unittest.TestCase):
         num_trace = 2.0*(galsim_img.calculateMomentRadius(center=hsm_output.moments_centroid, rtype='trace')**2.0)
         num_det = galsim_img.calculateMomentRadius(center=hsm_output.moments_centroid, rtype='det')**4.0
 
-        num_x = pixel_to_physical(hsm_output.moments_centroid.x,
+        num_x = utils.pixel_to_physical(hsm_output.moments_centroid.x,
                                   canvas_size=self.nx,
                                   pixel_scale=self.pixel_scale)
-        num_y = pixel_to_physical(hsm_output.moments_centroid.y,
+        num_y = utils.pixel_to_physical(hsm_output.moments_centroid.y,
                                          canvas_size=self.nx,
                                          pixel_scale=self.pixel_scale)
         
@@ -123,7 +123,7 @@ class AnalyticalTest(unittest.TestCase):
         galsim_img = total.drawImage(scale=self.pixel_scale, nx=self.nx, ny=self.nx, method='no_pixel')
         
         # Analytical
-        e, phi = e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
+        e, phi = utils.e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
         q = np.sqrt((1.0-e)/(1.0+e))
         # 1. Centered moments (no PSF)
         lam1 = self.gal_sigma**2.0/q
@@ -143,10 +143,10 @@ class AnalyticalTest(unittest.TestCase):
         num_trace = 2.0*(galsim_img.calculateMomentRadius(center=hsm_output.moments_centroid, rtype='trace')**2.0)
         num_det = galsim_img.calculateMomentRadius(center=hsm_output.moments_centroid, rtype='det')**4.0
 
-        num_x = pixel_to_physical(hsm_output.moments_centroid.x,
+        num_x = utils.pixel_to_physical(hsm_output.moments_centroid.x,
                                   canvas_size=self.nx,
                                   pixel_scale=self.pixel_scale)
-        num_y = pixel_to_physical(hsm_output.moments_centroid.y,
+        num_y = utils.pixel_to_physical(hsm_output.moments_centroid.y,
                                          canvas_size=self.nx,
                                          pixel_scale=self.pixel_scale)
         
@@ -172,7 +172,7 @@ class AnalyticalTest(unittest.TestCase):
         qso_ana = {}
         # Analytical
         # 1. Galaxy: centered moments (no PSF)
-        gal_ana['e'], gal_ana['phi'] = e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
+        gal_ana['e'], gal_ana['phi'] = utils.e1e2_to_ephi(e1=self.gal_e1, e2=self.gal_e2)
         gal_ana['q'] = np.sqrt((1.0 - gal_ana['e'])/(1.0 + gal_ana['e']))
         gal_ana['lam1'] = self.gal_sigma**2.0/gal_ana['q']
         gal_ana['lam2'] = self.gal_sigma**2.0*gal_ana['q']
@@ -209,8 +209,8 @@ class AnalyticalTest(unittest.TestCase):
         Iyy += self.psf_sigma**2.0
         
         # Numerical
-        num_Ix, num_Iy = get_first_moments_from_image(image_array, pixel_scale=self.pixel_scale)
-        num_Ixx, num_Ixy, num_Iyy = get_second_moments_from_image(image_array, pixel_scale=self.pixel_scale)
+        num_Ix, num_Iy = utils.get_first_moments_from_image(image_array, pixel_scale=self.pixel_scale)
+        num_Ixx, num_Ixy, num_Iyy = utils.get_second_moments_from_image(image_array, pixel_scale=self.pixel_scale)
         
         assert np.allclose([num_Ix, num_Iy], [Ix, Iy], rtol=1.e-3)
         assert np.isclose(num_Ixx, Ixx, rtol=1.e-3)

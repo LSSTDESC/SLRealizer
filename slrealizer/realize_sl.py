@@ -138,8 +138,8 @@ class SLRealizer(object):
             estimated_params['phi_final'] = shape_info.observed_shape.beta
         elif method == "raw_numerical":
             image_array = galsim_img.array
-            Ix, Iy = get_first_moments_from_image(image_array, self.pixel_scale)
-            Ixx, Ixy, Iyy = get_second_moments_from_image(image_array, self.pixel_scale)
+            Ix, Iy = utils.get_first_moments_from_image(image_array, self.pixel_scale)
+            Ixx, Ixy, Iyy = utils.get_second_moments_from_image(image_array, self.pixel_scale)
             estimated_params['apFlux'] = np.sum(image_array)
             estimated_params['x'] = Ix
             estimated_params['y'] = Iy
@@ -496,8 +496,8 @@ class SLRealizer(object):
         src['minor_to_major'] = np.power((1.0 - src['e'])/(1.0 + src['e']), 0.5) # q parameter in galsim.shear
         src['beta'] = np.radians(src['beta']) # beta parameter in galsim.shear 
          # Arbitrarily set REFF_T to 1.0
-        #src['sigmasq_lens'] = np.power(hlr_to_sigma(src['REFF_T']), 2.0)
-        src['sigmasq_lens'] = np.power(hlr_to_sigma(1.0), 2.0)
+        #src['sigmasq_lens'] = np.power(utils.hlr_to_sigma(src['REFF_T']), 2.0)
+        src['sigmasq_lens'] = np.power(utils.hlr_to_sigma(1.0), 2.0)
         
         # Initialize with lens contributions
         src['lam1'] = src['sigmasq_lens']/src['minor_to_major']
@@ -517,7 +517,7 @@ class SLRealizer(object):
             src['Ixy'] += src['qFluxRatio_' + str(q)]*(src['XIMG_' + str(q)] - src['x'])\
                                                      *(src['YIMG_' + str(q)] - src['y'])
         # Add PSF
-        src['sigmasq_psf'] = np.power(fwhm_to_sigma(src['psf_fwhm']), 2.0)
+        src['sigmasq_psf'] = np.power(utils.fwhm_to_sigma(src['psf_fwhm']), 2.0)
         src['Ixx'] += src['sigmasq_psf']
         src['Iyy'] += src['sigmasq_psf']
                 

@@ -66,7 +66,7 @@ class SDSSRealizer(SLRealizer):
         row['apFlux'] = lens_info['modelFlux_' + band]
         row['x'] = np.cos(np.deg2rad(lens_info['offsetDec_' + band]*3600.0)) * lens_info['offsetRa_' + band]
         row['y'] = lens_info['offsetDec_' + band]
-        row['trace'] = lens_info['mRrCc_' + band]*(self.sdss_pixel_scale)**2.0 + 2.0*fwhm_to_sigma(PSF_FWHM)**2.0
+        row['trace'] = lens_info['mRrCc_' + band]*(self.sdss_pixel_scale)**2.0 + 2.0*utils.fwhm_to_sigma(PSF_FWHM)**2.0
         row['e1'] = lens_info['mE1_' + band]
         row['e2'] = lens_info['mE2_' + band]
         
@@ -120,7 +120,7 @@ class SDSSRealizer(SLRealizer):
                                           shape=src['apFluxErr'].shape) # flux rms not skyEr
         src['x'] = np.cos(np.deg2rad(src['offsetDec']*3600.0))*src['offsetRa']
         src['y'] = src['offsetDec']
-        src['trace'] = src['mRrCc']*(self.sdss_pixel_scale**2.0) + 2.0*np.power(fwhm_to_sigma(src['FWHMeff']), 2.0)
+        src['trace'] = src['mRrCc']*(self.sdss_pixel_scale**2.0) + 2.0*np.power(utils.fwhm_to_sigma(src['FWHMeff']), 2.0)
         if self.add_moment_noise:
             src['x'] += utils.add_noise(mean=constants.get_first_moment_err(), 
                                   stdev=constants.get_first_moment_err_std(), 
