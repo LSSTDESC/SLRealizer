@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import unittest
 import os, sys
@@ -9,7 +7,6 @@ import pandas as pd
 import numpy as np
 
 from slrealizer import SDSSRealizer
-from slrealizer.utils.utils import *
 
 class SDSSRealizerTest(unittest.TestCase):
 

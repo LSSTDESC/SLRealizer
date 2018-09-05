@@ -1,7 +1,6 @@
 """
 All the constants should be accessed through the methods here, so that they would not be confused.
 """
-
 from astropy.coordinates import SkyCoord
 
 def return_zeropoint():

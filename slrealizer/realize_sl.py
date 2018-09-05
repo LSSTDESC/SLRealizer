@@ -6,8 +6,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-from slrealizer.utils.utils import *
-from slrealizer.utils.constants import *
+import slrealizer.utils.utils as utils
+import slrealizer.utils.constants as constants
 import pandas as pd
 import random
 import galsim
@@ -147,7 +147,7 @@ class SLRealizer(object):
             estimated_params['e1'] = (Ixx - Iyy)/trace
             estimated_params['e2'] = 2.0*Ixy/trace
             estimated_params['trace'] = trace
-            estimated_params['e_final'], estimated_params['phi_final'] = e1e2_to_ephi(estimated_params['e1'], estimated_params['e2'])
+            estimated_params['e_final'], estimated_params['phi_final'] = utils.e1e2_to_ephi(estimated_params['e1'], estimated_params['e2'])
         else:
             raise ValueError("Please enter a valid method, either 'hsm' or 'raw_numerical'")
 
@@ -187,21 +187,21 @@ class SLRealizer(object):
         '''
         histID, MJD, band, PSF_FWHM, sky_mag = obs_info
         
-        derived_params['apFluxErr'] = mag_to_flux(sky_mag-22.5)/5.0 # because Fb = 5 \sigma_b
+        derived_params['apFluxErr'] = utils.mag_to_flux(sky_mag-22.5)/5.0 # because Fb = 5 \sigma_b
         if self.add_moment_noise:
-            derived_params['trace'] += add_noise(mean=get_second_moment_err(), 
-                                               stdev=get_second_moment_err_std(), 
+            derived_params['trace'] += utils.add_noise(mean=constants.get_second_moment_err(), 
+                                               stdev=constants.get_second_moment_err_std(), 
                                                measurement=derived_params['trace'])
-            derived_params['x'] += add_noise(mean=get_first_moment_err(), 
-                                           stdev=get_first_moment_err_std(), 
+            derived_params['x'] += utils.add_noise(mean=constants.get_first_moment_err(), 
+                                           stdev=constants.get_first_moment_err_std(), 
                                            measurement=derived_params['x'])
-            derived_params['y'] += add_noise(mean=get_first_moment_err(), 
-                                           stdev=get_first_moment_err_std(), 
+            derived_params['y'] += utils.add_noise(mean=constants.get_first_moment_err(), 
+                                           stdev=constants.get_first_moment_err_std(), 
                                            measurement=derived_params['y']) 
         if self.add_flux_noise:
-            derived_params['apFlux'] += add_noise(mean=0.0, 
+            derived_params['apFlux'] += utils.add_noise(mean=0.0, 
                                                 stdev=derived_params['apFluxErr']) # flux rms not skyErr
-        derived_params['apMag'] = flux_to_mag(derived_params['apFlux'], from_unit='nMgy')
+        derived_params['apMag'] = utils.flux_to_mag(derived_params['apFlux'], from_unit='nMgy')
         derived_params['apMagErr'] = (2.5/np.log(10.0)) * derived_params['apFluxErr']/derived_params['apFlux']
         
         row = {'MJD': MJD, 'ccdVisitId': histID, 'filter': band, 'x': derived_params['x'], 'y': derived_params['y'],
@@ -481,11 +481,11 @@ class SLRealizer(object):
             src['x'] += src['qFluxRatio_' + str(q)]*src['XIMG_' + str(q)]
             src['y'] += src['qFluxRatio_' + str(q)]*src['YIMG_' + str(q)]
         if self.add_moment_noise:
-            src['x'] += add_noise(mean=get_first_moment_err(), 
+            src['x'] += utils.add_noise(mean=get_first_moment_err(), 
                                   stdev=get_first_moment_err_std(), 
                                   shape=src['x'].shape,
                                   measurement=src['x'])
-            src['y'] += add_noise(mean=get_first_moment_err(), 
+            src['y'] += utils.add_noise(mean=get_first_moment_err(), 
                                   stdev=get_first_moment_err_std(), 
                                   shape=src['y'].shape,
                                   measurement=src['y'])
@@ -524,13 +524,13 @@ class SLRealizer(object):
         # Get trace and ellipticities
         src['trace'] = src['Ixx'] + src['Iyy']
         if self.add_moment_noise:
-            src['trace'] += add_noise(mean=get_second_moment_err(), 
+            src['trace'] += utils.add_noise(mean=get_second_moment_err(), 
                                       stdev=get_second_moment_err_std(), 
                                       shape=src['trace'].shape,
                                       measurement=src['trace'])
         src['e1'] = (src['Ixx'] - src['Iyy'])/src['trace']
         src['e2'] = 2.0*src['Ixy']/src['trace']
-        src['e_final'], src['phi_final'] = e1e2_to_ephi(src['e1'], src['e2'])
+        src['e_final'], src['phi_final'] = utils.e1e2_to_ephi(src['e1'], src['e2'])
         
         if inplace:
             self.source_table = src

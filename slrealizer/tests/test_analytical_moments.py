@@ -1,12 +1,10 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import galsim
 import unittest
 import numpy as np
 import os, sys
-from slrealizer.utils.utils import *
+from slrealizer.utils.utils import e1e2_to_ephi, get_first_moments_from_image, get_second_moments_from_image
 
 class AnalyticalTest(unittest.TestCase):  
     """Tests the analytical equations used for calculating moments."""

@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import unittest
 import os, sys
@@ -13,7 +11,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from om10 import DB
 from slrealizer import OM10Realizer
-from slrealizer.utils.utils import *
 
 class OM10RealizerTest(unittest.TestCase):
 
