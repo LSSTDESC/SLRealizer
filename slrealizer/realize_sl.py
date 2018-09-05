@@ -124,8 +124,8 @@ class SLRealizer(object):
 
             # Calculate the real position from the arbitrary pixel position
             pixelCenter = galsim.PositionD(x=shape_info.moments_centroid.x, y=shape_info.moments_centroid.y)
-            estimated_params['x'], estimated_params['y'] = pixel_to_physical(shape_info.moments_centroid.x, self.nx, self.pixel_scale),\
-                                             pixel_to_physical(shape_info.moments_centroid.y, self.ny, self.pixel_scale)
+            estimated_params['x'], estimated_params['y'] = utils.pixel_to_physical(shape_info.moments_centroid.x, self.nx, self.pixel_scale),\
+                                             utils.pixel_to_physical(shape_info.moments_centroid.y, self.ny, self.pixel_scale)
 
             estimated_params['apFlux'] = float(np.sum(galsim_img.array))
             if self.DEBUG:
