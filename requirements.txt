@@ -8,4 +8,4 @@ scikit-learn==0.19.2
 corner
 git+git://github.com/jiwoncpark/lenspop.git@master#egg=lenspop
 git+git://github.com/jiwoncpark/om10.git@master#egg=om10
-galsim
+git+git://github.com/GalSim-developers/galsim.git@releases/2.0#egg=galsim
