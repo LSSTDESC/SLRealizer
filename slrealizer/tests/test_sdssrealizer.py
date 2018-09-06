@@ -22,15 +22,8 @@ class SDSSRealizerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        from slrealizer import data
-        
-        # Input catalogs
-        data_dir = data.__path__[0]
-        #input_object_catalog = os.path.join(data_dir, 'sdss_processed.csv')
-        #input_observation_catalog = os.path.join(data_dir, 'twinkles_observation_history.csv')
-        input_object_catalog = "https://www.dropbox.com/s/74moqzb5zhzmmiq/sdss_processed.csv?dl=1"
-        input_observation_catalog = "https://www.dropbox.com/s/2fgjk6ip69d64kb/twinkles_observation_history.csv?dl=1"
-
+        from slrealizer import Dataloader
+       
         # Output catalogs
         tests_dir = os.path.dirname(os.path.realpath(__file__))
         output_dir = os.path.join(tests_dir, 'test_output', 'test_sdssrealizer')
@@ -46,8 +39,11 @@ class SDSSRealizerTest(unittest.TestCase):
         for k, v in output_paths.items():
             setattr(cls, k, v)
 
-        test_sdss_df = pd.read_csv(input_object_catalog).sample(2, random_state=123).reset_index(drop=True)
-        test_obs_df = pd.read_csv(input_observation_catalog).query("(filter != 'y')").sample(20, random_state=123).reset_index(drop=True)
+        # Instantiate Dataloader
+        dataloader = Dataloader()
+        # Read in input data files
+        test_sdss_df = dataloader.read(filename='sdss', is_test=True)
+        test_obs_df = dataloader.read(filename='observation', is_test=True)
         # Instantiate SDSSRealizer
         cls.realizer = SDSSRealizer(observation=test_obs_df, catalog=test_sdss_df, debug=True, add_moment_noise=False, add_flux_noise=False)
         cls.nonlens_info = test_sdss_df.loc[0]

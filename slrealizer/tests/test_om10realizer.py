@@ -26,14 +26,8 @@ class OM10RealizerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        from slrealizer import data
+        from slrealizer import Dataloader
         
-        # Input catalogs
-        data_dir = data.__path__[0]
-        input_object_catalog = os.path.join(data_dir, 'test_catalog.fits')
-        #input_observation_catalog = os.path.join(data_dir, 'twinkles_observation_history.csv')
-        input_observation_catalog = "https://www.dropbox.com/s/2fgjk6ip69d64kb/twinkles_observation_history.csv?dl=1"
-
         # Output catalogs
         tests_dir = os.path.dirname(os.path.realpath(__file__))
         output_dir = os.path.join(tests_dir, 'test_output', 'test_om10realizer')
@@ -51,9 +45,11 @@ class OM10RealizerTest(unittest.TestCase):
         for k, v in output_paths.items():
             setattr(cls, k, v)
 
-        test_om10_db = DB(catalog=input_object_catalog)
-        test_om10_db.paint(synthetic=True)
-        test_obs_df = pd.read_csv(input_observation_catalog).query("(filter != 'y')").sample(20, random_state=123).reset_index(drop=True)
+        # Instantiate Dataloader
+        dataloader = Dataloader()
+        # Read in input data files
+        test_om10_db = dataloader.read(filename='om10', is_test=True)
+        test_obs_df = dataloader.read(filename='observation', is_test=True)
         # Instantiate OM10Realizer
         cls.realizer = OM10Realizer(observation=test_obs_df, catalog=test_om10_db, debug=True, add_moment_noise=False, add_flux_noise=False) 
         cls.lens_info = test_om10_db.sample[0]
