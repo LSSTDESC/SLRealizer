@@ -16,6 +16,7 @@ class Dataloader:
 
     def __init__(self):
         # Path of the data package where all data files reside
+        from slrealizer import data
         self.data_dir = data.__path__[0]
 
     def read(self, filename, is_test):
