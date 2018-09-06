@@ -1,0 +1,2 @@
+include slrealizer/data/test_catalog.fits
+global-include *.rst *.md

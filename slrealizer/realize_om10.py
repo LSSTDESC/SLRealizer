@@ -2,9 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from realize_sl import SLRealizer
-from utils.constants import *
-from utils.utils import *
+from slrealizer import SLRealizer
+import slrealizer.utils.utils as utils
+import slrealizer.utils.constants as constants
 import numpy as np
 import pandas as pd
 import galsim
@@ -52,7 +52,7 @@ class OM10Realizer(SLRealizer):
         
         # We will input flux in units of nMgy
         mag   = lens_info[band + '_SDSS_lens'] 
-        flux  = mag_to_flux(mag, to_unit='nMgy') # in nMgy
+        flux  = utils.mag_to_flux(mag, to_unit='nMgy') # in nMgy
         hlr   = lens_info['REFF_T'] # REFF_T is in arcsec
         e     = lens_info['ELLIP']
         beta  = lens_info['PHIE'] * galsim.degrees # PHIE is in degrees
@@ -65,9 +65,9 @@ class OM10Realizer(SLRealizer):
         
         for obj in xrange(lens_info['NIMG']):
             obj_mag = lens_info[band + '_SDSS_quasar']\
-            + flux_to_mag(abs(lens_info['MAG'][obj]))
-                      #+ flux_to_mag(lens_info['MAG'][obj] + get_filter_AB_offset())
-            galsimInput['flux_'+str(obj)] = mag_to_flux(obj_mag, to_unit='nMgy') # don't subtract AB offset?
+            + utils.flux_to_mag(abs(lens_info['MAG'][obj]))
+                      #+ utils.flux_to_mag(lens_info['MAG'][obj] + get_filter_AB_offset())
+            galsimInput['flux_'+str(obj)] = utils.mag_to_flux(obj_mag, to_unit='nMgy') # don't subtract AB offset?
             galsimInput['xy_'+str(obj)] = lens_info['XIMG'][obj], lens_info['YIMG'][obj]
             
         return galsimInput
@@ -90,9 +90,9 @@ class OM10Realizer(SLRealizer):
         # Initialize parameter dictionary
         numQuasars = lens_info['NIMG']
         lens_mag = lens_info[band + '_SDSS_lens']
-        lens_flux = mag_to_flux(lens_mag, to_unit='nMgy')
-        q_mag_arr = lens_info[band + '_SDSS_quasar'] + flux_to_mag(np.abs(np.array(lens_info['MAG'][:numQuasars])))
-        q_flux_arr = mag_to_flux(q_mag_arr, to_unit='nMgy')
+        lens_flux = utils.mag_to_flux(lens_mag, to_unit='nMgy')
+        q_mag_arr = lens_info[band + '_SDSS_quasar'] + utils.flux_to_mag(np.abs(np.array(lens_info['MAG'][:numQuasars])))
+        q_flux_arr = utils.mag_to_flux(q_mag_arr, to_unit='nMgy')
         q_tot_flux = np.sum(q_flux_arr)
         
         derived_params = {'psf_fwhm': psf_fwhm,
@@ -115,13 +115,13 @@ class OM10Realizer(SLRealizer):
         derived_params = self._include_moments(inplace=False, input_dict=derived_params)
 
         # Add flux noise
-        apFluxErr = mag_to_flux((five_sigma_depth - 22.5)/5.0)
+        apFluxErr = utils.mag_to_flux((five_sigma_depth - 22.5)/5.0)
         derived_params['apFluxErr'] = apFluxErr
         if self.add_flux_noise:
-            derived_params['apFlux'] += add_noise(mean=0.0, stdev=apFluxErr)
+            derived_params['apFlux'] += utils.add_noise(mean=0.0, stdev=apFluxErr)
 
         # Get total magnitude
-        derived_params['apMag'] = flux_to_mag(derived_params['apFlux'], from_unit='nMgy')
+        derived_params['apMag'] = utils.flux_to_mag(derived_params['apFlux'], from_unit='nMgy')
 
         # Propagate to get error on magnitude
         derived_params['apMagErr'] = (2.5/np.log(10.0)) * apFluxErr / derived_params['apFlux']
@@ -219,7 +219,7 @@ class OM10Realizer(SLRealizer):
 
         # Convert each quasar magnitude back to flux
         for q in range(4):
-            src['q_flux_' + str(q)] = mag_to_flux(src['q_mag_' + str(q)], to_unit='nMgy')
+            src['q_flux_' + str(q)] = utils.mag_to_flux(src['q_mag_' + str(q)], to_unit='nMgy')
         # Get total flux
         q_flux_cols = ['q_flux_' + str(q) for q in range(4)]
         src['apFlux'] = src[q_flux_cols + ['lens_flux']].sum(axis=1)
@@ -228,11 +228,11 @@ class OM10Realizer(SLRealizer):
         self._include_moments()
         
         # Add flux noise
-        src['apFluxErr'] = mag_to_flux(src['fiveSigmaDepth']-22.5)/5.0 # because Fb = 5 \sigma_b
+        src['apFluxErr'] = utils.mag_to_flux(src['fiveSigmaDepth']-22.5)/5.0 # because Fb = 5 \sigma_b
         if self.add_flux_noise:
-            src['apFlux'] += add_noise(mean=0.0, stdev=src['apFluxErr'], shape=src['apFluxErr'].shape)
+            src['apFlux'] += utils.add_noise(mean=0.0, stdev=src['apFluxErr'], shape=src['apFluxErr'].shape)
         # Get total magnitude
-        src['apMag'] = flux_to_mag(src['apFlux'], from_unit='nMgy')
+        src['apMag'] = utils.flux_to_mag(src['apFlux'], from_unit='nMgy')
         # Propagate to get error on magnitude
         src['apMagErr'] = (2.5/np.log(10.0)) * src['apFluxErr'] / src['apFlux']
         gc.collect()
@@ -281,7 +281,7 @@ class OM10Realizer(SLRealizer):
         saveCols = lensMagCols + qMagCols + ['REFF_T', 'NIMG', 'LENSID', 'ELLIP', 'PHIE']
         saveValues = [catalogAstropy[c] for c in saveCols]
         saveColDict = dict(zip(saveCols, saveValues))
-        collapsedColDict = get_1D_columns(multidimColNames=['MAG', 'XIMG', 'YIMG'], table=catalogAstropy)
+        collapsedColDict = utils.get_1D_columns(multidimColNames=['MAG', 'XIMG', 'YIMG'], table=catalogAstropy)
         saveColDict.update(collapsedColDict)
         catalog = Table(saveColDict.values(), names=saveColDict.keys()).to_pandas()
         catalog.drop_duplicates('LENSID', inplace=True)
@@ -324,10 +324,10 @@ class OM10Realizer(SLRealizer):
         gc.collect()
         
         # Convert magnitudes into fluxes
-        src['lens_flux'] = mag_to_flux(src['lens_mag'], to_unit='nMgy')
+        src['lens_flux'] = utils.mag_to_flux(src['lens_mag'], to_unit='nMgy')
         for q in range(4):
-            src['q_mag_' + str(q)] = src['q_mag'] + flux_to_mag(np.abs(src['MAG_' + str(q)]))
-            src['q_flux_' + str(q)] = mag_to_flux(src['q_mag_' + str(q)], to_unit='nMgy')
+            src['q_mag_' + str(q)] = src['q_mag'] + utils.flux_to_mag(np.abs(src['MAG_' + str(q)]))
+            src['q_flux_' + str(q)] = utils.mag_to_flux(src['q_mag_' + str(q)], to_unit='nMgy')
 
         # Set fluxes of nonexistent quasar images to zero
         src.loc[src['NIMG'] == 2, ['q_flux_2', 'q_flux_3']] = 0.0

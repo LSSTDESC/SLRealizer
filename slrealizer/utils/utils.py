@@ -1,5 +1,5 @@
+from __future__ import absolute_import, division, print_function
 import numpy as np
-
 
 def get_first_moments_from_image(image_array, pixel_scale):
     """ 

@@ -1,13 +1,10 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
-from realize_sl import SLRealizer
-from utils.constants import *
-from utils.utils import *
+from slrealizer import SLRealizer
+import slrealizer.utils.constants as constants 
+import slrealizer.utils.utils as utils
 import pandas as pd
 import numpy as np
-import galsim
 
 class SDSSRealizer(SLRealizer):
     
@@ -61,13 +58,13 @@ class SDSSRealizer(SLRealizer):
         row['ccdVisitId'] = histID
         row['MJD'] = MJD
         row['psf_fwhm'] = PSF_FWHM
-        row['apFluxErr'] = mag_to_flux(sky_mag-22.5)/5.0
+        row['apFluxErr'] = utils.mag_to_flux(sky_mag-22.5)/5.0
         
         row['objectId'] = lens_info['objectId']
         row['apFlux'] = lens_info['modelFlux_' + band]
         row['x'] = np.cos(np.deg2rad(lens_info['offsetDec_' + band]*3600.0)) * lens_info['offsetRa_' + band]
         row['y'] = lens_info['offsetDec_' + band]
-        row['trace'] = lens_info['mRrCc_' + band]*(self.sdss_pixel_scale)**2.0 + 2.0*fwhm_to_sigma(PSF_FWHM)**2.0
+        row['trace'] = lens_info['mRrCc_' + band]*(self.sdss_pixel_scale)**2.0 + 2.0*utils.fwhm_to_sigma(PSF_FWHM)**2.0
         row['e1'] = lens_info['mE1_' + band]
         row['e2'] = lens_info['mE2_' + band]
         
@@ -114,28 +111,28 @@ class SDSSRealizer(SLRealizer):
         ################
         # Adding noise #
         ################
-        src['apFluxErr'] = mag_to_flux(src['fiveSigmaDepth'] - 22.5)/5.0
+        src['apFluxErr'] = utils.mag_to_flux(src['fiveSigmaDepth'] - 22.5)/5.0
         if self.add_flux_noise:
-            src['modelFlux'] += add_noise(mean=0.0, 
+            src['modelFlux'] += utils.add_noise(mean=0.0, 
                                           stdev=src['apFluxErr'],
                                           shape=src['apFluxErr'].shape) # flux rms not skyEr
         src['x'] = np.cos(np.deg2rad(src['offsetDec']*3600.0))*src['offsetRa']
         src['y'] = src['offsetDec']
-        src['trace'] = src['mRrCc']*(self.sdss_pixel_scale**2.0) + 2.0*np.power(fwhm_to_sigma(src['FWHMeff']), 2.0)
+        src['trace'] = src['mRrCc']*(self.sdss_pixel_scale**2.0) + 2.0*np.power(utils.fwhm_to_sigma(src['FWHMeff']), 2.0)
         if self.add_moment_noise:
-            src['x'] += add_noise(mean=get_first_moment_err(), 
-                                  stdev=get_first_moment_err_std(), 
+            src['x'] += utils.add_noise(mean=constants.get_first_moment_err(), 
+                                  stdev=constants.get_first_moment_err_std(), 
                                   shape=src['x'].shape,
                                   measurement=src['x'])
-            src['y'] += add_noise(mean=get_first_moment_err(), 
-                                  stdev=get_first_moment_err_std(), 
+            src['y'] += utils.add_noise(mean=constants.get_first_moment_err(), 
+                                  stdev=constants.get_first_moment_err_std(), 
                                   shape=src['y'].shape,
                                   measurement=src['y'])
-            src['trace'] += add_noise(mean=get_second_moment_err(), 
-                                     stdev=get_second_moment_err_std(), 
+            src['trace'] += utils.add_noise(mean=constants.get_second_moment_err(), 
+                                     stdev=constants.get_second_moment_err_std(), 
                                      shape=src['trace'].shape,
                                      measurement=src['trace'])
-        src['apMag'] = flux_to_mag(src['modelFlux'], from_unit='nMgy')
+        src['apMag'] = utils.flux_to_mag(src['modelFlux'], from_unit='nMgy')
         src['apMagErr'] = (2.5/np.log(10.0)) * src['apFluxErr'] / src['modelFlux']
         
         #####################################################
@@ -147,7 +144,7 @@ class SDSSRealizer(SLRealizer):
                             'modelFlux': 'apFlux',
                             'mE1': 'e1',
                             'mE2': 'e2'}, inplace=True)
-        src['e_final'], src['phi_final'] = e1e2_to_ephi(src['e1'], src['e2'])
+        src['e_final'], src['phi_final'] = utils.e1e2_to_ephi(src['e1'], src['e2'])
         src.drop(['mRrCc', 'offsetRa', 'offsetDec', 'fiveSigmaDepth'], axis=1, inplace=True)
         gc.collect()
         print("Number of observations: ", src['MJD'].nunique())
