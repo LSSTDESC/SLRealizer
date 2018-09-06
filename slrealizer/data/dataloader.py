@@ -14,11 +14,11 @@ class Dataloader:
         Reads in the data file
     """
 
-    def __init__(self)
+    def __init__(self):
         # Path of the data package where all data files reside
         self.data_dir = data.__path__[0]
 
-    def read(self, filename, is_test)
+    def read(self, filename, is_test):
         allowed_filenames = ['om10', 'observation', 'sdss']
 
         if filename=='om10':
