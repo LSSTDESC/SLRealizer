@@ -1,5 +1,5 @@
-#from distutils.core import setup
-from setuptools import setup
+from setuptools import setup, find_packages
+# print(find_packages('.'))
 
 setup(
     name='slrealizer',
@@ -12,21 +12,24 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type='text/markdown',
     url='https://github.com/LSSTDESC/SLRealizer',
-    package_dir={'slrealizer':'slrealizer'},
+    install_requires=[
+        "pybind",
+        "pip==9.0.3",
+        "numpy>=1.13",
+        "future>=0.15",
+        "matplotlib>=2.2.2",
+        "astropy==2.0",
+        "pandas>=0.20",
+        "scikit-learn==0.19.2",
+        "corner",
+        "galsim"],
     include_package_data=True,
-    package_data={'slrealizer': ['/data/*']},
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: BSD License',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
-    ],
-    install_requires=[
-        "matplotlib >= 2.2.2",
-        "numpy >= 1.13.1",
-        "astropy >= 0.18.1",
-        "om10",
-    ],
+        'Programming Language :: Python'],
+    keywords='physics'
 )

@@ -2,22 +2,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import numpy as np
-from slrealizer.utils import *
+import slrealizer.utils.utils as utils
+import slrealizer.utils.constants as constants
 import pandas as pd
 import random
-import om10
 import galsim
 
 class SLRealizer(object):
 
     """
-
     Class equipped with utility functions
     for making the LSST-like object and source tables
     inherited by child classes which are associated with a specific non-LSST catalog,
-    e.g. the child class OM10Realizer converts the OM10 catalog into a mock LSST catalog
-
+    e.g. the child class OM10Realizer converts the OM10 catalog into a mock LSST catalog.
     """
 
     def __init__(self, observation, add_moment_noise, add_flux_noise):
@@ -77,23 +78,25 @@ class SLRealizer(object):
         '''
         histID, MJD, band, PSF_FWHM, sky_mag = obs_info
 
-        # Lens galaxy
-        galaxy = galsim.Gaussian(half_light_radius=galsimInput['half_light_radius'],\
-                                 flux=galsimInput['flux'])\
+        # Construct a "scene" of image components:
+        # i) Lens galaxy #half_light_radius=galsimInput['half_light_radius'],\
+        scene = galsim.Gaussian(sigma=1.0, flux=galsimInput['flux'])\
                        .shear(e=galsimInput['e'], beta=galsimInput['beta'])
-        # Lensed quasar
+        # ii) Lensed quasar images
         for i in xrange(galsimInput['num_objects']):
-            lens = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=0.0)\
+            quasar = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=1.e-5)\
                          .shift(galsimInput['xy_'+str(i)])
-            galaxy += lens
+            scene += quasar
 
+        # Convolve the scene with the PSF:
         psf = galsim.Gaussian(flux=1.0, fwhm=PSF_FWHM)
-        galsim_obj = galsim.Convolve([galaxy, psf], gsparams=self.fft_params)
-        galsim_img = galsim_obj.drawImage(nx=self.nx, ny=self.ny, scale=self.pixel_scale)
+        galsim_obj = galsim.Convolve([scene, psf], gsparams=self.fft_params)
+        galsim_img = galsim_obj.drawImage(nx=self.nx, ny=self.ny, scale=self.pixel_scale, method='no_pixel')
         if save_path is not None:
             plt.imshow(galsim_img.array, interpolation='none', aspect='auto')
             plt.savefig(save_path)
             plt.close()
+
         return galsim_img
 
     def estimate_parameters(self, galsim_img, method="raw_numerical"):
@@ -122,8 +125,8 @@ class SLRealizer(object):
 
             # Calculate the real position from the arbitrary pixel position
             pixelCenter = galsim.PositionD(x=shape_info.moments_centroid.x, y=shape_info.moments_centroid.y)
-            estimated_params['x'], estimated_params['y'] = pixel_to_physical(shape_info.moments_centroid.x, self.nx, self.pixel_scale),\
-                                             pixel_to_physical(shape_info.moments_centroid.y, self.ny, self.pixel_scale)
+            estimated_params['x'], estimated_params['y'] = utils.pixel_to_physical(shape_info.moments_centroid.x, self.nx, self.pixel_scale),\
+                                             utils.pixel_to_physical(shape_info.moments_centroid.y, self.ny, self.pixel_scale)
 
             estimated_params['apFlux'] = float(np.sum(galsim_img.array))
             if self.DEBUG:
@@ -136,8 +139,8 @@ class SLRealizer(object):
             estimated_params['phi_final'] = shape_info.observed_shape.beta
         elif method == "raw_numerical":
             image_array = galsim_img.array
-            Ix, Iy = get_first_moments_from_image(image_array, self.pixel_scale)
-            Ixx, Ixy, Iyy = get_second_moments_from_image(image_array, self.pixel_scale)
+            Ix, Iy = utils.get_first_moments_from_image(image_array, self.pixel_scale)
+            Ixx, Ixy, Iyy = utils.get_second_moments_from_image(image_array, self.pixel_scale)
             estimated_params['apFlux'] = np.sum(image_array)
             estimated_params['x'] = Ix
             estimated_params['y'] = Iy
@@ -145,7 +148,7 @@ class SLRealizer(object):
             estimated_params['e1'] = (Ixx - Iyy)/trace
             estimated_params['e2'] = 2.0*Ixy/trace
             estimated_params['trace'] = trace
-            estimated_params['e_final'], estimated_params['phi_final'] = e1e2_to_ephi(estimated_params['e1'], estimated_params['e2'])
+            estimated_params['e_final'], estimated_params['phi_final'] = utils.e1e2_to_ephi(estimated_params['e1'], estimated_params['e2'])
         else:
             raise ValueError("Please enter a valid method, either 'hsm' or 'raw_numerical'")
 
@@ -185,21 +188,21 @@ class SLRealizer(object):
         '''
         histID, MJD, band, PSF_FWHM, sky_mag = obs_info
 
-        derived_params['apFluxErr'] = mag_to_flux(sky_mag-22.5)/5.0 # because Fb = 5 \sigma_b
+        derived_params['apFluxErr'] = utils.mag_to_flux(sky_mag-22.5)/5.0 # because Fb = 5 \sigma_b
         if self.add_moment_noise:
-            derived_params['trace'] += add_noise(mean=get_second_moment_err(),
-                                               stdev=get_second_moment_err_std(),
+            derived_params['trace'] += utils.add_noise(mean=constants.get_second_moment_err(),
+                                               stdev=constants.get_second_moment_err_std(),
                                                measurement=derived_params['trace'])
-            derived_params['x'] += add_noise(mean=get_first_moment_err(),
-                                           stdev=get_first_moment_err_std(),
+            derived_params['x'] += utils.add_noise(mean=constants.get_first_moment_err(),
+                                           stdev=constants.get_first_moment_err_std(),
                                            measurement=derived_params['x'])
-            derived_params['y'] += add_noise(mean=get_first_moment_err(),
-                                           stdev=get_first_moment_err_std(),
+            derived_params['y'] += utils.add_noise(mean=constants.get_first_moment_err(),
+                                           stdev=constants.get_first_moment_err_std(),
                                            measurement=derived_params['y'])
         if self.add_flux_noise:
-            derived_params['apFlux'] += add_noise(mean=0.0,
+            derived_params['apFlux'] += utils.add_noise(mean=0.0,
                                                 stdev=derived_params['apFluxErr']) # flux rms not skyErr
-        derived_params['apMag'] = flux_to_mag(derived_params['apFlux'], from_unit='nMgy')
+        derived_params['apMag'] = utils.flux_to_mag(derived_params['apFlux'], from_unit='nMgy')
         derived_params['apMagErr'] = (2.5/np.log(10.0)) * derived_params['apFluxErr']/derived_params['apFlux']
 
         row = {'MJD': MJD, 'ccdVisitId': histID, 'filter': band, 'x': derived_params['x'], 'y': derived_params['y'],
@@ -479,11 +482,11 @@ class SLRealizer(object):
             src['x'] += src['qFluxRatio_' + str(q)]*src['XIMG_' + str(q)]
             src['y'] += src['qFluxRatio_' + str(q)]*src['YIMG_' + str(q)]
         if self.add_moment_noise:
-            src['x'] += add_noise(mean=get_first_moment_err(),
+            src['x'] += utils.add_noise(mean=get_first_moment_err(),
                                   stdev=get_first_moment_err_std(),
                                   shape=src['x'].shape,
                                   measurement=src['x'])
-            src['y'] += add_noise(mean=get_first_moment_err(),
+            src['y'] += utils.add_noise(mean=get_first_moment_err(),
                                   stdev=get_first_moment_err_std(),
                                   shape=src['y'].shape,
                                   measurement=src['y'])
@@ -494,8 +497,8 @@ class SLRealizer(object):
         src['minor_to_major'] = np.power((1.0 - src['e'])/(1.0 + src['e']), 0.5) # q parameter in galsim.shear
         src['beta'] = np.radians(src['beta']) # beta parameter in galsim.shear
          # Arbitrarily set REFF_T to 1.0
-        #src['sigmasq_lens'] = np.power(hlr_to_sigma(src['REFF_T']), 2.0)
-        src['sigmasq_lens'] = np.power(hlr_to_sigma(1.0), 2.0)
+        #src['sigmasq_lens'] = np.power(utils.hlr_to_sigma(src['REFF_T']), 2.0)
+        src['sigmasq_lens'] = np.power(utils.hlr_to_sigma(1.0), 2.0)
 
         # Initialize with lens contributions
         src['lam1'] = src['sigmasq_lens']/src['minor_to_major']
@@ -515,20 +518,20 @@ class SLRealizer(object):
             src['Ixy'] += src['qFluxRatio_' + str(q)]*(src['XIMG_' + str(q)] - src['x'])\
                                                      *(src['YIMG_' + str(q)] - src['y'])
         # Add PSF
-        src['sigmasq_psf'] = np.power(fwhm_to_sigma(src['psf_fwhm']), 2.0)
+        src['sigmasq_psf'] = np.power(utils.fwhm_to_sigma(src['psf_fwhm']), 2.0)
         src['Ixx'] += src['sigmasq_psf']
         src['Iyy'] += src['sigmasq_psf']
 
         # Get trace and ellipticities
         src['trace'] = src['Ixx'] + src['Iyy']
         if self.add_moment_noise:
-            src['trace'] += add_noise(mean=get_second_moment_err(),
+            src['trace'] += utils.add_noise(mean=get_second_moment_err(),
                                       stdev=get_second_moment_err_std(),
                                       shape=src['trace'].shape,
                                       measurement=src['trace'])
         src['e1'] = (src['Ixx'] - src['Iyy'])/src['trace']
         src['e2'] = 2.0*src['Ixy']/src['trace']
-        src['e_final'], src['phi_final'] = e1e2_to_ephi(src['e1'], src['e2'])
+        src['e_final'], src['phi_final'] = utils.e1e2_to_ephi(src['e1'], src['e2'])
 
         if inplace:
             self.source_table = src

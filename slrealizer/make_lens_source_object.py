@@ -5,15 +5,7 @@ from __future__ import print_function
 import os, sys
 from om10 import DB
 import pandas as pd
-import numpy as np
 
-# PJM: if slrealizer package is installed, we should not need to
-# adjust the sys.path here:
-# realizer_path = os.path.join(os.environ['SLREALIZERDIR'], 'slrealizer')
-# sys.path.insert(0, realizer_path)
-
-# PJM: use slrealizer package:
-# from realize_om10 import OM10Realizer
 from slrealizer import OM10Realizer
 
 if __name__=='__main__':
@@ -21,8 +13,6 @@ if __name__=='__main__':
     An annotated version of this script can be found in
     demo/Example+SLRealizer+Usage.ipynb.
     """
-    # PJM: Avoid the need for an environment variable:
-    # data_path = os.path.join(os.environ['SLREALIZERDIR'], 'data')
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
 
     catalog_f = os.path.join(data_path, 'qso_mock.fits')
