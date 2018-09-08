@@ -12,7 +12,7 @@ SLRealizer
 Basic Strong Lens Realization
 -----------------------------
 
-.. automodule:: realize_sl
+.. automodule:: slrealizer.realize_sl
     :members:
     :undoc-members:
 
@@ -20,7 +20,7 @@ Basic Strong Lens Realization
 Realizing OM10 Lensed Quasars
 -----------------------------
 
-.. automodule:: realize_om10
+.. automodule:: slrealizer.realize_om10
     :members:
     :undoc-members:
 
@@ -28,7 +28,7 @@ Realizing OM10 Lensed Quasars
 Realizing Non-Lenses: SDSS Galaxies
 -----------------------------------
 
-.. automodule:: realize_sdss
+.. automodule:: slrealizer.realize_sdss
     :members:
     :undoc-members:
 
@@ -36,11 +36,11 @@ Realizing Non-Lenses: SDSS Galaxies
 Using SLRealizer
 ----------------
 
-.. automodule:: make_lens_source_object
+.. automodule:: slrealizer.make_lens_source_object
     :members:
     :undoc-members:
 
 
-.. automodule:: make_nonlens_source_object
+.. automodule:: slrealizer.make_nonlens_source_object
     :members:
     :undoc-members:
