@@ -15,17 +15,16 @@ import galsim
 class SLRealizer(object):
 
     """
-    Class equipped with utility functions
-    for making the LSST-like object and source tables
+    Worker class equipped with functions
+    for making LSST-like "Object" and "Source" tables. These are
     inherited by child classes which are associated with a specific non-LSST catalog,
-    e.g. the child class OM10Realizer converts the OM10 catalog into a mock LSST catalog.
+    e.g. the child class OM10Realizer realizes the lenses in the OM10 catalog into mock LSST tables.
+    :class:`SLRealizer` objects are instantiated with
+    an observation history, provided as a `pandas` dataframe.
     """
 
     def __init__(self, observation, add_moment_noise, add_flux_noise):
-        """
-        Reads in a lens sample catalog and observation data.
-        We assume lenses are OM10 lenses and observation file is a pandas df
-        """
+        # Observation history
         self.observation = observation
         self.num_obs = len(self.observation)
 
@@ -52,20 +51,41 @@ class SLRealizer(object):
     def get_obs_info(self, obsID=None, rownum=None):
         if obsID is not None and rownum is not None:
             raise ValueError("Need to define either obsID or rownum, not both.")
-
         if obsID is not None:
             return self.observation.loc[self.observation['obsHistID']==obsID]
         elif rownum is not None:
             return self.observation.loc[rownum]
 
     def _get_lens_info(self, lensID):
-        ''' This function will depend on the format of each lens catalog '''
+        ''' This function will depend on the format of each lens catalog.
+        '''
         raise NotImplementedError
 
-    def draw_system(self, galsimInput, obs_info, save_path=None):
+    def draw_system(self, lens_info, obs_info, save_path=None):
         '''
         Draws all objects of the given lens system
-        in the given observation conditions using GalSim
+        in the given observation conditions, using GalSim.
+
+        Parameters
+        ==========
+        lens_info: pandas.Dataframe
+            a row of the OM10 DB
+        obs_info: pandas.Dataframe
+            a row of the observation history df
+        save_path: string
+            path in which to save the image
+
+        Returns
+        =======
+        galsim_img: galsim.Image
+            A GalSim image object of the aggregate system
+        '''
+        # Old docstring, for comparison - to be deleted!
+        # For more help writing nice docstrings, check out
+        # https://python-sprints.github.io/pandas/guide/pandas_docstring.html
+        '''
+        Draws all objects of the given lens system
+        in the given observation conditions, using GalSim.
 
         Keyword arguments:
         lens_info -- a row of the OM10 DB
@@ -79,13 +99,13 @@ class SLRealizer(object):
         histID, MJD, band, PSF_FWHM, sky_mag = obs_info
 
         # Construct a "scene" of image components:
-        # i) Lens galaxy #half_light_radius=galsimInput['half_light_radius'],\
-        scene = galsim.Gaussian(sigma=1.0, flux=galsimInput['flux'])\
-                       .shear(e=galsimInput['e'], beta=galsimInput['beta'])
+        # i) Lens galaxy #half_light_radius=lens_info['half_light_radius'],\
+        scene = galsim.Gaussian(sigma=1.0, flux=lens_info['flux'])\
+                       .shear(e=lens_info['e'], beta=lens_info['beta'])
         # ii) Lensed quasar images
-        for i in xrange(galsimInput['num_objects']):
-            quasar = galsim.Gaussian(flux=galsimInput['flux_'+str(i)], sigma=1.e-5)\
-                         .shift(galsimInput['xy_'+str(i)])
+        for i in xrange(lens_info['num_objects']):
+            quasar = galsim.Gaussian(flux=lens_info['flux_'+str(i)], sigma=1.e-5)\
+                         .shift(lens_info['xy_'+str(i)])
             scene += quasar
 
         # Convolve the scene with the PSF:
