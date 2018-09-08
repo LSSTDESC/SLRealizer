@@ -74,3 +74,6 @@ target/
 *.csv
 *.txt
 *.fits
+
+# Sphinx
+_build
