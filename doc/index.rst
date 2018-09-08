@@ -33,14 +33,26 @@ Realizing Non-Lenses: SDSS Galaxies
     :undoc-members:
 
 
-Using SLRealizer
-----------------
+Utilities
+---------
 
-.. automodule:: slrealizer.make_lens_source_object
+Accessing Standard Data Files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: slrealizer.data.dataloader
     :members:
     :undoc-members:
 
+Useful Functions
+^^^^^^^^^^^^^^^^
 
-.. automodule:: slrealizer.make_nonlens_source_object
+.. automodule:: slrealizer.utils.utils
+    :members:
+    :undoc-members:
+
+Useful Constants
+^^^^^^^^^^^^^^^^
+
+.. automodule:: slrealizer.utils.constants
     :members:
     :undoc-members:
