@@ -3,11 +3,13 @@ import os
 import sphinx_rtd_theme
 
 # Provide path to the python modules we want to run autodoc on
-sys.path.insert(0, os.path.abspath('../slrealizer/.'))
-sys.path.insert(0, os.path.abspath('../slrealizer/utils/.'))
-sys.path.insert(0, os.path.abspath('../slrealizer/data/.'))
-sys.path.insert(0, os.path.abspath('../.'))
-sys.path.insert(0, os.path.abspath('.'))
+repo_rootpath = os.path.abspath('..')
+package_rootpath = os.path.join(repo_rootpath, 'slrealizer')
+sys.path.insert(0, package_rootpath)
+sys.path.insert(0, os.path.join(package_rootpath, 'utils'))
+sys.path.insert(0, os.path.join(package_rootpath, 'data'))
+sys.path.insert(0, repo_rootpath)
+sys.path.insert(0, os.path.abspath(__file__)) # path to docs
 # Avoid imports that may be unsatisfied when running sphinx, see:
 # http://stackoverflow.com/questions/15889621/sphinx-how-to-exclude-imports-in-automodule#15912502
 autodoc_mock_imports = ["nbformat", "IPython", "IPython.core.interactiveshell", "numpy", "pandas", "gc", "om10", "astropy", "galsim", "matplotlib"]
