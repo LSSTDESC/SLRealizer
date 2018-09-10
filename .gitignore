@@ -66,6 +66,7 @@ target/
 
 # Backup files
 *~
+*#
 
 # LensPop trash
 *.pkl
