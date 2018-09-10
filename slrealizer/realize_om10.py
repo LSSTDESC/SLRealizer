@@ -7,7 +7,7 @@ import slrealizer.utils.utils as utils
 import slrealizer.utils.constants as constants
 import numpy as np
 import pandas as pd
-# import galsim
+import galsim
 import gc # need this to optimize memory usage
 
 class OM10Realizer(SLRealizer):
