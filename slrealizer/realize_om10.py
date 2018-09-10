@@ -135,7 +135,7 @@ class OM10Realizer(SLRealizer):
 
     def draw_system(self, obs_info, lens_info, save_path=None):
         galsimInput = self._om10_to_galsim(lens_info, obs_info['filter'])
-        return self.as_super.draw_system(galsimInput=galsimInput, obs_info=obs_info, save_path=save_path)
+        return self.as_super.draw_system(lens_info=lens_info, obs_info=obs_info, save_path=save_path)
 
     def estimate_parameters(self, obs_info, lens_info, method="raw_numerical"):
         """
