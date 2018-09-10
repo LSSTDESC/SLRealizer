@@ -66,6 +66,7 @@ target/
 
 # Backup files
 *~
+*#
 
 # LensPop trash
 *.pkl
@@ -74,3 +75,6 @@ target/
 *.csv
 *.txt
 *.fits
+
+# Sphinx
+_build

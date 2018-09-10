@@ -1,5 +1,5 @@
 """
-All the constants should be accessed through the methods here, so that they would not be confused.
+The :mod:`constants` module provides a number of constants used by the :class:`SLRealizer` worker class and its descendants.
 """
 from astropy.coordinates import SkyCoord
 

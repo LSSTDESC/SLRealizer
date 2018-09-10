@@ -1,15 +1,18 @@
+"""
+The :mod:`utils` module provides a number of utility functions used by the :class:`SLRealizer` worker class and its descendants.
+"""
 from __future__ import absolute_import, division, print_function
 import numpy as np
 
 def get_first_moments_from_image(image_array, pixel_scale):
-    """ 
+    """
     Returns the first moments in arcsec units numerically computed from
     an image on a pixel grid
-    
+
     Keyword arguments:
     image_array -- a numpy image array
     pixel_scale -- scale factor for the image in arcsec/pixel
- 
+
     Returns:
     a tuple of the first moments Ix, Iy in arcsec
     """
@@ -19,19 +22,19 @@ def get_first_moments_from_image(image_array, pixel_scale):
     x_coords = pixel_grid[1, :, :] * pixel_scale
     y_coords = pixel_grid[0, :, :] * pixel_scale
     total_flux = np.sum(image_array)
-    Ix = np.sum(image_array * x_coords) / total_flux 
-    Iy = np.sum(image_array * y_coords) / total_flux 
+    Ix = np.sum(image_array * x_coords) / total_flux
+    Iy = np.sum(image_array * y_coords) / total_flux
     return Ix, Iy
 
 def get_second_moments_from_image(image_array, pixel_scale):
-    """ 
+    """
     Returns the second moments in arcsec units numerically computed from
     an image on a pixel grid
-    
+
     Keyword arguments:
     image_array -- a numpy image array
     pixel_scale -- scale factor for the image in arcsec/pixel
- 
+
     Returns:
     a tuple of the second moments Ixx, Ixy, Iyy in arcsec
     """
@@ -42,9 +45,9 @@ def get_second_moments_from_image(image_array, pixel_scale):
     x_coords = pixel_grid[1, :, :] * pixel_scale
     y_coords = pixel_grid[0, :, :] * pixel_scale
     total_flux = np.sum(image_array)
-    Ixx = np.sum(image_array * np.power(x_coords, 2.0)) / total_flux 
-    Ixy = np.sum(image_array * x_coords * y_coords) / total_flux 
-    Iyy = np.sum(image_array * np.power(y_coords, 2.0)) / total_flux 
+    Ixx = np.sum(image_array * np.power(x_coords, 2.0)) / total_flux
+    Ixy = np.sum(image_array * x_coords * y_coords) / total_flux
+    Iyy = np.sum(image_array * np.power(y_coords, 2.0)) / total_flux
     return Ixx, Ixy, Iyy
 
 def e1e2_to_ephi(e1, e2):
@@ -98,13 +101,13 @@ def mag_to_flux(mag, zeropoint_mag=0.0, from_unit=None, to_unit=None):
 def add_noise(mean, stdev, shape=None, measurement=1.0):
     """
     Given a mean and a standard deviation of a measurement, adds Gaussian noise to the data
-    
+
     Keyword arguments:
     mean -- the mean of Gaussian
     stdev -- the standard deviation of Gaussian
     shape -- the array shape of noise to be returned
              If None, returns a scalar noise [default: None]
-    measurement -- scaling factor, for adding fractional errors. 
+    measurement -- scaling factor, for adding fractional errors.
                    If 1.0, error is absolute. [default: 1.0]
     """
     return measurement*np.random.normal(loc=mean, scale=stdev, size=shape)
@@ -117,10 +120,10 @@ def return_coordinate(first_moment_x, first_moment_y):
     and this method also assumes a random error in the measurement (+1/-1 deg)
     """
 
-###                                                                         
-    pos_err = 0.0 # unit : degree                                               
-    pos_err_std = Fraction(1, 3) # Assuming that the three sigma is one degree, one sigma is 0.3333 degree                                                     
-    ###      
+###
+    pos_err = 0.0 # unit : degree
+    pos_err_std = Fraction(1, 3) # Assuming that the three sigma is one degree, one sigma is 0.3333 degree
+    ###
 
     real_coordinate = desc.slrealizer.return_obs_RA_DEC()
     RA = real_coordinate.ra.deg
