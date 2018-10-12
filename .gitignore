@@ -62,7 +62,7 @@ target/
 .ipynb_checkpoints
 
 # Practice Notebooks
-*/practice_notebook.ipynb
+*practice_notebook.ipynb
 
 # Backup files
 *~
@@ -75,6 +75,7 @@ target/
 *.csv
 *.txt
 *.fits
+*.npy
 
 # Sphinx
 _build
