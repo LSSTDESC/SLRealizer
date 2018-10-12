@@ -88,10 +88,4 @@ def calculate_mog_second_moments(size_major, size_minor, e1, e2, mog_var, mog_we
         # Explicit for-loop over the Gaussian components
         raise NotImplementedError
         #for weight, var in list(zip(mog_weights, mog_var)):
-            
-            
-            
-            
-        
-        
         
