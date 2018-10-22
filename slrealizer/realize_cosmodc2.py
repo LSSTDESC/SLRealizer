@@ -31,8 +31,8 @@ class CosmoDC2Realizer(SLRealizer):
     
     def _separate_bulge_disk(self, is_centered=1, catalog_to_preformat=None):
         """
-        Preprocesses the input object catalog with the column conventions
-        that can be interpreted by the class methods
+        Separates the input object catalog into bulge-related and disk-related
+        dataframes, for easy Sersic-to-Gaussian conversion.
         Parameters
         ==========
         is_centered: Bool
@@ -44,13 +44,16 @@ class CosmoDC2Realizer(SLRealizer):
         preformatted_catalog: Pandas.DataFrame
             The resulting preformatted catalog.
         """
-        df = self.catalog
+        if catalog_to_preformat is None:
+            df = self.catalog
+        else:
+            df = catalog_to_preformat
         # Set galaxy_id as index
         df.set_index('galaxy_id', inplace=True)
         # Add disk_to_total_ratio_i = 1.0 - bulge_to_total_ratio_i
         df['disk_to_total_ratio'] = 1.0 - df['bulge_to_total_ratio_i'].values
         # Add is_centered = 1.0 (these objects have zero first moments by definition)
-        df['is_centered'] = 1
+        df['is_centered'] = is_centered
         # Add flux column for each filter, disk/bulge flux, and disk/bulge mag
         for bandpass in 'ugrizY':
             df['flux_true_%s_lsst' %bandpass] = utils.mag_to_flux(df['mag_true_%s_lsst' %bandpass].values, from_unit='nMgy')
@@ -71,6 +74,38 @@ class CosmoDC2Realizer(SLRealizer):
         disk_df['is_bulge'] = 0
             return bulge_df, disk_df
     
+    def _sersic_to_gaussian(self, df_to_convert, is_bulge, num_gaussians=None):
+        """
+        Converts the Sersic parameters into their approximate mixture of Gaussian (MoG) parameters
+        Parameters
+        ==========
+        df_to_convert: Pandas.DataFrame
+        is_bulge: whether the dataframe contains bulges, in which case each bulge is modeled as a
+                de Vaucouleurs profile (Sersic index = 4). If False, we assume it contains disks
+                which are exponential (Sersic index = 1).
+        num_gaussians: how many Gaussians to approximate the bulge/disk with. Default is 6 for bulge
+                and 4 for disk. Currently, only the default is implemented.
+        Returns
+        =======
+        gaussian_catalog: Pandas.DataFrame
+            The resulting preformatted catalog with the moments Ixx, Ixy, Iyy for each (bulge or disk) object
+        """
+        df = df_to_convert
+        if is_bulge:
+            sersic_index = 4 # de Vaucouleurs
+            component = 'bulge'
+        else: # then is disk!
+            sersic_index = 1 # exponential
+            component = 'disk'
+        
+        second_moments_values = moments.sersic_to_mog(sersic_index=4, vectorize=True,
+                                               size_major=df['size_%s_true' %component].values,
+                                               size_minor=df['size_minor_%s_true' %component].values, 
+                                               e1=df['ellipticity_1_%s_true' %component].values,
+                                               e2=df['ellipticity_2_%s_true' %component].values)
+        second_moments_df = pd.DataFrame(second_moments_values, index=df.index, columns=['Ixx', 'Ixy', 'Izz'])
+        return second_moments_df
+                            
     def _preformat_source_table(self):
         """
         Initializes self.source_table by combining the observation and object catalogs

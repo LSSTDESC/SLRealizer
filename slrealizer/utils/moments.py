@@ -3,9 +3,10 @@ The :mod:`moments` module provides functions related to moment estimation used b
 """
 from __future__ import absolute_import, division, print_function
 import numpy as np
+import utils
 import gc
 
-def sersic_to_mog(sersic_index=4, size_major, size_minor, e, theta, vectorize=True):
+def sersic_to_mog(sersic_index, size_major, size_minor, e1, e2, vectorize=True):
     '''
     Interface to the function that turns a Sersic profile into a mixture of Gaussians
     and calculates the second moments
@@ -24,9 +25,9 @@ def sersic_to_mog(sersic_index=4, size_major, size_minor, e, theta, vectorize=Tr
     vectorize: Boolean
         whether to vectorize the moment calculation over the Gaussian components and the Sersic profiles
     '''
-    if type(size_major) == type(size_minor) == type(e) == type(theta) == np.ndarray:
+    if type(size_major) == type(size_minor) == type(e1) == type(e2):
         pass
-    elif type(size_major) == type(size_minor) == type(e) == type(theta):
+    elif type(size_major) == type(size_minor) == type(e1) == type(e2):
         if isinstance(size_major, (float, int)):
             pass
         else:
@@ -46,7 +47,7 @@ def sersic_to_mog(sersic_index=4, size_major, size_minor, e, theta, vectorize=Tr
         
     return calculate_mog_second_moments(size_major=size_major, size_minor=size_minor, e1=e1, e2=e2, mog_var=mog_var, mog_weights=mog_weights, vectorize=vectorize)
     
-def calculate_mog_second_moments(size_major, size_minor, e1, e2, mog_var, mog_weights, vectorize):
+def calculate_mog_second_moments(size_major, size_minor, e1, e2, mog_var, mog_weights, object_id, vectorize):
     '''
     Calculates the second moments of the mixture of Gaussians that approximates the Sersic
     Parameters
@@ -63,10 +64,13 @@ def calculate_mog_second_moments(size_major, size_minor, e1, e2, mog_var, mog_we
     second_moments: NumPy.ndarray
         an array of second moments Ixx, Ixy, Iyy of the mixture of Gaussians
     '''
-    num_gaussians = len(mog_stds)
+    num_gaussians = len(mog_var)
+    mog_var = mog_var.reshape(1, -1)
     mog_weights = mog_weights.reshape(1, -1)/np.sum(mog_weights)
     
-    if isinstance(size_major, np.ndarray) and vectorize:
+    # TODO: check isinstance(size_major, np.ndarray) and
+    if vectorize:
+        e, theta = utils.e1e2_to_ephi(e1=e1, e2=e2)
         # Let n be length of parameter array.
         size_major_sq = size_major.reshape(-1, 1)**2.0 # (n, 1) square of r0_major
         size_minor_sq = size_minor.reshape(-1, 1)**2.0 # (n, 1) square of r0_minor
@@ -74,7 +78,7 @@ def calculate_mog_second_moments(size_major, size_minor, e1, e2, mog_var, mog_we
         cos_theta = np.cos(theta) # (n, 1)
         sin_theta = np.sin(theta) # (n, 1)
         gc.collect()
-
+        
         Ixx_unrotated = np.dot(size_major_sq, mog_var) # (n, num_gaussians), equals r0_major^2*vm
         Iyy_unrotated = np.dot(size_minor_sq, mog_var) # (n, num_gaussians), equals r0_minor^2*vm
         Ixx = cos_theta**2.0*Ixx_unrotated + sin_theta*Iyy_unrotated # (n, num_gaussians), note broadcasting
