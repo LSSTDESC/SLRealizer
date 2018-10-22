@@ -80,11 +80,13 @@ class CosmoDC2Realizer(SLRealizer):
         Parameters
         ==========
         df_to_convert: Pandas.DataFrame
-        is_bulge: whether the dataframe contains bulges, in which case each bulge is modeled as a
-                de Vaucouleurs profile (Sersic index = 4). If False, we assume it contains disks
-                which are exponential (Sersic index = 1).
-        num_gaussians: how many Gaussians to approximate the bulge/disk with. Default is 6 for bulge
-                and 4 for disk. Currently, only the default is implemented.
+        is_bulge: Bool
+            whether the dataframe contains bulges, in which case each bulge is modeled as a
+            de Vaucouleurs profile (Sersic index = 4). If False, we assume it contains disks
+            which are exponential (Sersic index = 1).
+        num_gaussians: int
+            how many Gaussians to approximate the bulge/disk with. Default is 6 for bulge
+            and 4 for disk. Currently, only the default is implemented.
         Returns
         =======
         gaussian_catalog: Pandas.DataFrame
@@ -106,16 +108,17 @@ class CosmoDC2Realizer(SLRealizer):
         second_moments_df = pd.DataFrame(second_moments_values, index=df.index, columns=['Ixx', 'Ixy', 'Izz'])
         return second_moments_df
                             
-    def _preformat_source_table(self):
+    def make_source_table_vectorized(self):
         """
-        Initializes self.source_table by combining the observation and object catalogs
-        with the column conventions that can be used by utility functions 
-        related to moment estimation
+        Makes the source table by combining the observation and object catalogs
         """
-        # call _preformat_input_objects and assign output to self.input_centered_objects
+        # call _separate_bulge_disk
+        # call _sersic_to_gaussians
         # optionally call _add_neighbors
-        
-        # Combine with observation catalog
+        # optionally call _add_star_neighbors
+        # call _join_with_opsim
+        # add moment contribution from seeing
+        # add flux noise from sky noise
         # Rename columns
         src.rename(columns={'obsHistID': 'ccdVisitId',
             'LENSID': 'objectId',
@@ -141,19 +144,42 @@ class CosmoDC2Realizer(SLRealizer):
         
         self.source_table = src
     
-    def _add_neighbors(self, neighbor_catalog, within_distance):
+    def _join_with_opsim(self):
+    
+
+    def _add_neighbors(self, centered_catalog, neighbor_catalog, max_neighbors=2, within_radius=5.0):
         """
         Adds neighbors from a separate catalog that are located 
-        within a given radius, to self.input_centered_objects
+        within a given radius, to centered objects
         Parameters
         ==========
+        centered_catalog: Pandas.DataFrame
+            catalog containing centered objects, for which to get neighbors
         neighbor_catalog: Pandas.DataFrame
-            catalog containing neighbors of the centered objects
+            catalog containing potential neighbors of the centered objects
         within_radius: float
             radius in arcsec within which to include the neighboring objects
+        Returns
+        =======
         """
-        if self.input_centered_objects is None:
-            raise ValueError("Must first define what objects will be at the center.")
+    
+     def _add_stars(self, centered_catalog, star_catalog, max_stars, within_radius=5.0):
+        """
+        Adds line-of-sight stars from a separate catalog that are located 
+        within a given radius, to centered objects
+        Parameters
+        ==========
+        centered_catalog: Pandas.DataFrame
+            catalog containing centered objects, for which to get neighboring stars
+        star_catalog: Pandas.DataFrame
+            catalog containing potential neighboring stars of the centered objects
+        within_radius: float
+            radius in arcsec within which to include the neighboring stars
+        Returns
+        =======
+        """
+        
+        
         # Call _preformat_input_objects(is_centered=0, catalog_to_preformat=neighbor_catalog)
         # Combine group of centered + neighbors in a common key 
 
