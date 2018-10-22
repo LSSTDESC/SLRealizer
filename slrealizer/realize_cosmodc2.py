@@ -29,10 +29,10 @@ class CosmoDC2Realizer(SLRealizer):
         self.neighbors = None
         self.source_table = None
     
-    def _preformat_input_objects(self, is_centered=1, catalog_to_preformat=None):
+    def _separate_bulge_disk(self, is_centered=1, catalog_to_preformat=None):
         """
         Preprocesses the input object catalog with the column conventions
-        that can be interpreted by the class functions
+        that can be interpreted by the class methods
         Parameters
         ==========
         is_centered: Bool
@@ -44,14 +44,32 @@ class CosmoDC2Realizer(SLRealizer):
         preformatted_catalog: Pandas.DataFrame
             The resulting preformatted catalog.
         """
+        df = self.catalog
         # Set galaxy_id as index
+        df.set_index('galaxy_id', inplace=True)
         # Add disk_to_total_ratio_i = 1.0 - bulge_to_total_ratio_i
-        # Add flux column for each filter
-        # Add disk flux and bulge flux
-        # Update magnitudes so that there are now disk magnitudes and bulge magnitudes
-        # Separate df into bulge-related and disk-related
-        # Add is_bulge column that takes value 1 if bulge and 0 if disk
+        df['disk_to_total_ratio'] = 1.0 - df['bulge_to_total_ratio_i'].values
         # Add is_centered = 1.0 (these objects have zero first moments by definition)
+        df['is_centered'] = 1
+        # Add flux column for each filter, disk/bulge flux, and disk/bulge mag
+        for bandpass in 'ugrizY':
+            df['flux_true_%s_lsst' %bandpass] = utils.mag_to_flux(df['mag_true_%s_lsst' %bandpass].values, from_unit='nMgy')
+            df['flux_true_%s_lsst_disk' %bandpass] = df['flux_true_%s_lsst' %bandpass].values*df['disk_to_total_ratio'].values
+            df['flux_true_%s_lsst_bulge' %bandpass] = df['flux_true_%s_lsst' %bandpass].values*df['bulge_to_total_ratio_i'].values
+            df['mag_true_%s_lsst_disk' %bandpass] = utils.flux_to_mag(df['flux_true_%s_lsst_disk' %bandpass].values, to_unit='nMgy')
+            df['mag_true_%s_lsst_bulge' %bandpass] = utils.flux_to_mag(df['flux_true_%s_lsst_bulge' %bandpass].values, to_unit='nMgy')
+        # Not sure if necessary
+        for component in ['disk', 'bulge']:
+            df['ra_true_%s' %component] = df['ra_true'].values
+            df['dec_true_%s' %component] = df['dec_true'].values
+            df['is_centered_%s' %component] = df['is_centered'].values
+        # Separate df into bulge-related and disk-related
+        bulge_df = df.filter(like='bulge', axis=1).copy()
+        disk_df = df.filter(like='disk', axis=1).copy()
+        # Add is_bulge column that takes value 1 if bulge and 0 if disk
+        bulge_df['is_bulge'] = 1
+        disk_df['is_bulge'] = 0
+            return bulge_df, disk_df
     
     def _preformat_source_table(self):
         """
