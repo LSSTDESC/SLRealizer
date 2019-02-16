@@ -528,7 +528,7 @@ class SLRealizer(object):
         src['lens_Ixy'] = (src['lam1'] - src['lam2'])*np.cos(src['beta'])*np.sin(src['beta'])
         src['Ixx'] = src['lensFluxRatio']*(src['lens_Ixx'] + np.power(src['x'], 2.0))
         src['Iyy'] = src['lensFluxRatio']*(src['lens_Iyy'] + np.power(src['y'], 2.0))
-        src['Ixy'] = src['lensFluxRatio']*(src['lens_Ixy'] - src['x']*src['y'])
+        src['Ixy'] = src['lensFluxRatio']*(src['lens_Ixy'] - src['x']*src['y']) # I think this is PLUS xy
         if not return_dict:
             src.drop(['lam1', 'lam2', 'lens_Ixx', 'lens_Iyy', 'lens_Ixy'], axis=1, inplace=True)
         # Add quasar contributions
