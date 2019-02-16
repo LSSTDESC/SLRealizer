@@ -49,13 +49,14 @@ def calculate_2nd_moments(df):
     df = df.reset_index()
     return df
 
-def apply_psf(df):
+def apply_environment(df):
     df['Ixx'] += df['Ixx_PSF']
     df['Iyy'] += df['Ixx_PSF']
+    df['apFlux'] *= np.random.normal(0.0, df['apFluxErr'].values)
     return df
 
 def collapse_mog(mog_df):
-    collapsed = mog_df.groupby(['objectId', 'ccdVisitId'])['apFlux', 'Ix', 'Iy', 'Ixx', 'Iyy', 'Ixy', 
+    collapsed = mog_df.groupby(['objectId', 'ccdVisitId',])['apFlux', 'Ix', 'Iy', 'Ixx', 'Iyy', 'Ixy', 
                                                            'apFluxErr', 'sky', 'Ixx_PSF', 'expMJD',
                                                            'num_gal_neighbors',
                                                            'num_star_neighbors', 'num_agn_neighbors', 'num_sprinkled_neighbors'].mean()

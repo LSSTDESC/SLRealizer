@@ -4,27 +4,26 @@ import pandas as pd
 from itertools import product
 import units
 
-def _format_obs_history(obs_history, save_to_disk=False):
+def _format_obs_history(obs_history, field_ids, save_to_disk=None):
+    obs_history = obs_history.loc[obs_history['Field_fieldID'].isin(field_ids)].copy()
     # Some unit conversion and column renaming
     obs_history['Ixx_PSF'] = units.fwhm_to_sigma(obs_history['finSeeing'].values)**2.0
-    obs_history['apFluxErr'] = units.mag_to_flux(obs_history['fiveSigmaDepth']-22.5)/5.0
+    obs_history['apFluxErr'] = units.mag_to_flux(obs_history['fiveSigmaDepth'].values-22.5)/5.0
     obs_history = obs_history.rename({'filtSkyBrightness': 'sky', 'obsHistID': 'ccdVisitId'}, axis=1)
     # Only keep columns we'll need
     obs_keep_cols = ['ccdVisitId', 'Field_fieldID', 'expMJD', 'Ixx_PSF', 'apFluxErr', 'sky', 'filter',]
     obs_history = obs_history[obs_keep_cols]
-    if save_to_disk:
-        save_obs_history = 'obs_history.csv'
-        obs_history.to_csv(save_obs_history, index=False)
+    if save_to_disk is not None:
+        obs_history.to_csv(save_to_disk, index=False)
     return obs_history
 
-def _format_field(field, save_to_disk=False):
+def _format_field(field, save_to_disk=None):
     field[['fieldRA', 'fieldDec']] = units.deg_to_arcsec(field[['fieldRA', 'fieldDec']])
-    if save_to_disk:
-        save_field = 'field.csv'
-        field.to_csv(save_field, index=False)
+    if save_to_disk is not None:
+        field.to_csv(save_to_disk, index=False)
     return field
 
-def _format_extragal_catalog(galaxies, save_to_disk=False):
+def _format_extragal_catalog(galaxies, save_to_disk=None):
     
     filters = list('ugrizy')
     galaxies.columns = map(str.lower, galaxies.columns)
@@ -49,19 +48,17 @@ def _format_extragal_catalog(galaxies, save_to_disk=False):
     galaxies_cols_to_keep += ['ra_disk', 'dec_disk', 'size_circular_disk', 'e_disk', 'phi_disk'] 
     galaxies_cols_to_keep += [prop + '_' + bp for prop, bp in product(['flux_bulge', 'flux_disk'], filters)]
     galaxies = galaxies[galaxies_cols_to_keep]
-    if save_to_disk:
-        save_galaxies = 'galaxies.csv'
-        galaxies.to_csv(save_galaxies, index=False)
+    if save_to_disk is not None:
+        galaxies.to_csv(save_to_disk, index=False)
     return galaxies
 
-def _format_truth_catalog(point_neighbors, save_to_disk=False):
+def _format_truth_catalog(point_neighbors, save_to_disk=None):
     # Point-source neighbors
     point_neighbors[['ra', 'dec']] = units.deg_to_arcsec(point_neighbors[['ra', 'dec']])
     for bp in 'ugrizy':
         point_neighbors['flux_%s' %bp] = units.mag_to_flux(point_neighbors[bp].values, to_unit='nMgy')
-    if save_to_disk:
-        save_point_neighbors = 'point_neighbors.csv'
-        point_neighbors.to_csv(save_point_neighbors, index=False)
+    if save_to_disk is not None:
+        point_neighbors.to_csv(save_to_disk, index=False)
     return point_neighbors
 
 def get_neighbors(candidate_df, reference_ra, reference_dec, radius):
