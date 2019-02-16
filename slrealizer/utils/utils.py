@@ -50,6 +50,10 @@ def get_second_moments_from_image(image_array, pixel_scale):
     Iyy = np.sum(image_array * np.power(y_coords, 2.0)) / total_flux
     return Ixx, Ixy, Iyy
 
+def e1e2_to_phi(e1, e2):
+    phi = 0.5*np.arctan(e2/e1)
+    return phi
+
 def e1e2_to_ephi(e1, e2):
     e = np.power(np.power(e1, 2.0) + np.power(e2, 2.0), 0.5)
     phi = 0.5*np.arctan(e2/e1)
@@ -59,6 +63,12 @@ def ephi_to_e1e2(e, phi):
     e1 = e*np.cos(2.0*phi)
     e2 = e*np.sin(2.0*phi)
     return e1, e2
+
+def deg_to_arcsec(deg):
+    return 3600.0*deg
+
+def arcsec_to_deg(arcsec):
+    return arcsec/3600.0
 
 def get_1D_columns(multidimColNames, table):
     totalColDict = {}
