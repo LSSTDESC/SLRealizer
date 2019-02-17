@@ -170,6 +170,3 @@ def collapse_unobserved_fluxes(multi_filter_df):
     # Delete filter-specific fluxes
     single_filter_df = multi_filter_df.drop(all_flux_cols, axis=1)
     return single_filter_df
-
-def threshold_detection(df):
-    
