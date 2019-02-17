@@ -5,26 +5,49 @@ from itertools import product
 import units
 
 def _format_obs_history(obs_history, field_ids, save_to_disk=None):
-    obs_history = obs_history.loc[obs_history['Field_fieldID'].isin(field_ids)].copy()
+    """
+    Parameters
+    ----------
+    obs_history : Pandas.DataFrame
+    field_ids : list
+    save_to_disk : bool
+    
+    Note
+    ----
+    We use the dithered RA, Dec and express all positions in arcsec.
+    
+    Returns
+    -------
+    DataFrame obs_history, formatted with new column conventions and units
+    """
+    # Join with Field table
+    obs_history_dithered = pd.merge(obs_history, field, left_on='Field_fieldID', right_on='fieldID')
     # Some unit conversion and column renaming
+    # NOTE: OpSim DB defines dithered positions as offset from the field center.
+    obs_history['ditheredRA'] = units.deg_to_arcsec(obs_history['ditheredRA'].values + obs_history['fieldRA'].values)
+    obs_history['ditheredDec'] = units.deg_to_arcsec(obs_history['ditheredDec'].values  + obs_history['fieldDec'].values)
     obs_history['Ixx_PSF'] = units.fwhm_to_sigma(obs_history['finSeeing'].values)**2.0
     obs_history['apFluxErr'] = units.mag_to_flux(obs_history['fiveSigmaDepth'].values-22.5)/5.0
     obs_history = obs_history.rename({'filtSkyBrightness': 'sky', 'obsHistID': 'ccdVisitId'}, axis=1)
     # Only keep columns we'll need
-    obs_keep_cols = ['ccdVisitId', 'Field_fieldID', 'expMJD', 'Ixx_PSF', 'apFluxErr', 'sky', 'filter',]
+    obs_keep_cols = ['ccdVisitId', 'Field_fieldID', 'expMJD', 
+                     'ditheredRA', 'ditheredDec', 'Ixx_PSF', 'apFluxErr', 'sky', 'filter',]
     obs_history = obs_history[obs_keep_cols]
     if save_to_disk is not None:
         obs_history.to_csv(save_to_disk, index=False)
     return obs_history
 
+'''
 def _format_field(field, save_to_disk=None):
-    field[['fieldRA', 'fieldDec']] = units.deg_to_arcsec(field[['fieldRA', 'fieldDec']])
+    # NOTE: OpSim DB documentation says RA, Dec are in radians but they seem to be in degrees.
+    # field[['fieldRA', 'fieldDec']] = units.deg_to_arcsec(np.rad2deg(field[['fieldRA', 'fieldDec']]))
     if save_to_disk is not None:
         field.to_csv(save_to_disk, index=False)
     return field
+'''
 
 def _format_extragal_catalog(galaxies, save_to_disk=None):
-    
+    # Unit conversion and column renaming
     filters = list('ugrizy')
     galaxies.columns = map(str.lower, galaxies.columns)
     galaxies[['ra', 'dec']] = units.deg_to_arcsec(galaxies[['ra_true', 'dec_true']])
@@ -42,7 +65,7 @@ def _format_extragal_catalog(galaxies, save_to_disk=None):
         galaxies['dec_%s' %component] = galaxies['dec'].values
         galaxies['size_circular_%s' %component] = (galaxies['size_minor_%s_true' %component].values*galaxies['size_%s_true' %component].values)**0.5
         galaxies['e_%s' %component] = galaxies['ellipticity_%s_true' %component]
-
+    # Only keep columns we'll use
     galaxies_cols_to_keep = ['galaxy_id', 'ra', 'dec'] # 'agn', 'sprinkled', 'star']
     galaxies_cols_to_keep += ['ra_bulge', 'dec_bulge', 'size_circular_bulge', 'e_bulge', 'phi_bulge']
     galaxies_cols_to_keep += ['ra_disk', 'dec_disk', 'size_circular_disk', 'e_disk', 'phi_disk'] 
@@ -61,9 +84,9 @@ def _format_truth_catalog(point_neighbors, save_to_disk=None):
         point_neighbors.to_csv(save_to_disk, index=False)
     return point_neighbors
 
-def get_neighbors(candidate_df, reference_ra, reference_dec, radius):
+def get_neighbors(candidate_df, reference_ra, reference_dec, radius, ra_colname='ra', dec_colname='dec'):
     from scipy import spatial
-    positions = np.c_[candidate_df[['ra', 'dec']].values]
+    positions = np.c_[candidate_df[[ra_colname, dec_colname]].values]
     tree = spatial.cKDTree(positions)
     target_objects_idx = tree.query_ball_point(x=[reference_ra, reference_dec], r=radius, p=2)
     target_objects = candidate_df.iloc[target_objects_idx].copy()
