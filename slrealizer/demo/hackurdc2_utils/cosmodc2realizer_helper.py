@@ -21,7 +21,7 @@ def _format_obs_history(obs_history, field, save_to_disk=None):
     DataFrame obs_history, formatted with new column conventions and units
     """
     # Join with Field table
-    obs_history_dithered = pd.merge(obs_history, field, left_on='Field_fieldID', right_on='fieldID')
+    obs_history = pd.merge(obs_history, field, left_on='Field_fieldID', right_on='fieldID')
     # Some unit conversion and column renaming
     # NOTE: OpSim DB defines dithered positions as offset from the field center.
     obs_history['ditheredRA'] = units.deg_to_arcsec(obs_history['ditheredRA'].values + obs_history['fieldRA'].values)
