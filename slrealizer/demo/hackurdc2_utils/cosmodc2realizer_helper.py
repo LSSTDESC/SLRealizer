@@ -4,13 +4,13 @@ import pandas as pd
 from itertools import product
 import units
 
-def _format_obs_history(obs_history, field_ids, save_to_disk=None):
+def _format_obs_history(obs_history, field, save_to_disk=None):
     """
     Parameters
     ----------
     obs_history : Pandas.DataFrame
-    field_ids : list
-    save_to_disk : bool
+    field : Pandas.DataFrame
+    save_to_disk : str
     
     Note
     ----
@@ -170,3 +170,6 @@ def collapse_unobserved_fluxes(multi_filter_df):
     # Delete filter-specific fluxes
     single_filter_df = multi_filter_df.drop(all_flux_cols, axis=1)
     return single_filter_df
+
+def threshold_detection(df):
+    
