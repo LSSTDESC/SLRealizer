@@ -52,7 +52,7 @@ def calculate_2nd_moments(df):
 def apply_environment(df):
     df['Ixx'] += df['Ixx_PSF']
     df['Iyy'] += df['Ixx_PSF']
-    df['apFlux'] *= np.random.normal(0.0, df['apFluxErr'].values)
+    df['apFlux'] += np.random.normal(0.0, df['apFluxErr'].values)
     return df
 
 def collapse_mog(mog_df):
