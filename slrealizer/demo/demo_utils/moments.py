@@ -49,7 +49,7 @@ def calculate_2nd_moments(df):
     df = df.reset_index()
     return df
 
-def apply_environment(df):
+def apply_environment(df, add_flux_noise=True):
     df['Ixx'] += df['Ixx_PSF']
     df['Iyy'] += df['Ixx_PSF']
     df['apFlux'] += np.random.normal(0.0, df['apFluxErr'].values)

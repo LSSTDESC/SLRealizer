@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from itertools import product
 import units
+import moments
 
 def _format_obs_history(obs_history, field, save_to_disk=None):
     """
@@ -33,6 +34,7 @@ def _format_obs_history(obs_history, field, save_to_disk=None):
     obs_keep_cols = ['ccdVisitId', 'Field_fieldID', 'expMJD', 
                      'ditheredRA', 'ditheredDec', 'Ixx_PSF', 'apFluxErr', 'sky', 'filter',]
     obs_history = obs_history[obs_keep_cols]
+    obs_history['ccdVisitId'] = obs_history['ccdVisitId'].astype(np.int64)
     if save_to_disk is not None:
         obs_history.to_csv(save_to_disk, index=False)
     return obs_history
@@ -116,14 +118,14 @@ def point_to_mog(point_df):
 def sersic_to_mog(sersic_df, bulge_or_disk):
     from scipy.special import gammaincinv
     if bulge_or_disk=='bulge':
-        # Mixture of gaussian parameters for de Vaucouleurs profile from HL13
+        # Mixture of gaussian parameters for de Vaucouleurs profile from Hogg and Lang #2013)
         weights = [0.00139, 0.00941, 0.04441, 0.16162, 0.48121, 1.20357, 2.54182, 4.46441, 6.22821, 6.15393]
         stdevs = [0.00087, 0.00296, 0.00792, 0.01902, 0.04289, 0.09351, 0.20168, 0.44126, 1.01833, 2.74555]
         mog_params = {'weight': weights, 'stdev': stdevs}
-        sersic_norm = gammaincinv(8, 0.5)
+        sersic_norm = gammaincinv(8, 0.5) # for deVaucouleurs
         gauss_norm = 40320.0*np.pi*np.exp(sersic_norm)/sersic_norm**8.0
     elif bulge_or_disk=='disk':
-        # Mixture of gaussian parameters for exponential profile from HL13
+        # Mixture of gaussian parameters for exponential profile from Hogg and Lang #2013)
         weights = [0.00077, 0.01017, 0.07313, 0.37188, 1.39727, 3.56054, 4.74340, 1.78732]
         stdevs = [0.02393, 0.06490, 0.13580, 0.25096, 0.42942, 0.69672, 1.08879, 1.67294]
         mog_params = {'weight': weights, 'stdev': stdevs}
@@ -170,3 +172,62 @@ def collapse_unobserved_fluxes(multi_filter_df):
     # Delete filter-specific fluxes
     single_filter_df = multi_filter_df.drop(all_flux_cols, axis=1)
     return single_filter_df
+
+def typecast_source(source_df):
+    source_df['ccdVisitId'] = source_df['ccdVisitId'].astype(np.int64)
+    source_df['objectId'] = source_df['objectId'].astype(np.int64)
+    source_df['num_gal_neighbors'] = source_df['num_gal_neighbors'].astype(np.int8)
+    return source_df
+
+def realize_all_visits_single_object(target_object_id, is_galaxy, fov, deblending_scale,
+                                    galaxies_df, points_df, obs_history, add_flux_noise=False):
+    source_cols = ['objectId', 'ccdVisitId', 
+               'apFlux', 'Ix', 'Iy', 'Ixx', 'Iyy', 'Ixy', 
+               'Ixx_PSF', 'sky', 'apFluxErr', 'expMJD',
+               'num_star_neighbors', 'num_agn_neighbors', 'num_sprinkled_neighbors']
+    # Initialize DataFrame to populate before joining with obs_history_in_field
+    target_source_rows = pd.DataFrame(columns=source_cols)
+    
+    # Target galaxy
+    this_galaxy = galaxies_df.query('galaxy_id == @target_object_id')
+    ra_center, dec_center = this_galaxy['ra'].item(), this_galaxy['dec'].item() # pos of central galaxy
+    
+    #################
+    # Sersic to MoG #
+    #################
+    if is_galaxy:
+        # Separate galaxy catalog into bulge and disk
+        bulge, disk, all_gal = separate_bulge_disk(this_galaxy)
+        # Deconstruct bulge/disk into MoG
+        bulge_mog = sersic_to_mog(sersic_df=bulge, bulge_or_disk='bulge')
+        disk_mog = sersic_to_mog(sersic_df=disk, bulge_or_disk='disk')
+        full_mog = pd.concat([bulge_mog, disk_mog,], axis=0)
+        full_mog['objectId'] = target_object_id
+    else:
+        # Query truth catalog for stars/AGNs within blending radius
+        this_star, _ = get_neighbors(points_df, ra_center, dec_center, deblending_scale)
+        point_mog = point_to_mog(point_df=this_star)
+        full_mog = point_mog.copy()
+        full_mog['objectId'] = this_star['object_id']
+
+    # Add some metadata
+    full_mog['num_gal_neighbors'] = 0
+    full_mog['num_star_neighbors'] = 0
+    full_mog['num_agn_neighbors'] = 0
+    full_mog['num_sprinkled_neighbors'] = 0
+
+    # Get visits at the system's position
+    obs_sys_center, _ = get_neighbors(obs_history, ra_center, dec_center, fov, 'ditheredRA', 'ditheredDec')
+    # Join with observations
+    mog_observed = join_with_observation(full_mog, obs_sys_center)
+    # Remove unobserved fluxes (only keep flux of observed filter)
+    mog_observed = collapse_unobserved_fluxes(mog_observed)
+    # Calculate moment contribution of each Gaussian of blended system
+    mog_observed = moments.calculate_total_flux(mog_observed)
+    mog_observed = moments.calculate_1st_moments(mog_observed)
+    mog_observed = moments.calculate_2nd_moments(mog_observed)
+    # Collapse MoGs into one blended system
+    target_source_rows = moments.collapse_mog(mog_observed)
+    target_source_rows = moments.apply_environment(target_source_rows, add_flux_noise)
+
+    return target_source_rows

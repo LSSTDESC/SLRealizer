@@ -39,21 +39,26 @@ def plot_bic(param_range,bics,lowest_comp):
     
 def get_sl2s_data(filename):
     """
+    Note
+    ----
+    Edited from original version in `MatchingLensGalaxies_utilities.py`
     Returns
     -------
     Formatted SL2S data (Sonnenfeld et al. 2013) where the schema for X is:
     column index : value
     0 : z
     1 : v_disp
-    2 : r_eff
-    3 : log_m
+    2 : r_eff --> removed
+    3 : log_m --> 2: log_m
+    
+    # TODO avoid number indexing
     """
     z = np.array([])
     z_err = np.array([])
     v_disp = np.array([])
     v_disp_err = np.array([])
-    r_eff = np.array([])
-    r_eff_err = np.array([])
+    #r_eff = np.array([])
+    #r_eff_err = np.array([])
     log_m = np.array([])
     log_m_err = np.array([])
     
@@ -66,60 +71,63 @@ def get_sl2s_data(filename):
         #Params
         z = np.append(z, float(line[1]))
         v_disp = np.append(v_disp, float(line[2]))
-        r_eff = np.append(r_eff, float(line[3]))
+        #r_eff = np.append(r_eff, float(line[3]))
         log_m = np.append(log_m, float(line[4]))
         #Errors
         z_err = np.append(z_err, float(line[5]))
         v_disp_err = np.append(v_disp_err, float(line[6]))
-        r_eff_err = np.append(r_eff_err, float(line[7]))
+        #r_eff_err = np.append(r_eff_err, float(line[7]))
         log_m_err = np.append(log_m_err, float(line[8]))
     
     #Build final arrays
-    X = np.vstack([z, v_disp, r_eff, log_m]).T # shape (N, 4)
-    Xerr = np.zeros(X.shape + X.shape[-1:]) # shape (N, 4, 4)
-    diag = np.arange(X.shape[-1]) # range(4)
+    X = np.vstack([z, v_disp, 
+                   #r_eff,
+                   log_m]).T # shape (N, 4) --> (N, 3) without radius
+    Xerr = np.zeros(X.shape + X.shape[-1:]) # shape (N, 4, 4) --> (N, 3, 3) without radius
+    diag = np.arange(X.shape[-1]) # range(4) --> range(3)
     
     Xerr[:, diag, diag] = np.vstack([z_err**2, v_disp_err**2,
-                                    r_eff_err**2, log_m_err**2]).T
+                                     #r_eff_err**2,
+                                     log_m_err**2]).T
     
     return X, Xerr
 
 def get_log_m(cond_indices, m_index, X, empiricist, model_file, Xerr=None):
     
     """
-        Uses a subset of parameters in the given data to condition the
-        model and return a sample value for log(M/M_sun).
+    Uses a subset of parameters in the given data to condition the
+    model and return a sample value for log(M/M_sun).
 
-        Parameters
-        ----------
-        cond_indices: array_like
-            Array of indices indicating which parameters to use to
-            condition the model. 
-        m_index: int
-            Index of log(M/M_sun) in the list of parameters that were used
-            to fit the model.
-        X: array_like, shape = (n < n_features,)
-            Input data.
-        Xerr: array_like, shape = (X.shape,) (optional)
-            Error on input data. If none, no error used to condition.
+    Parameters
+    ----------
+    cond_indices: array_like
+        Array of indices indicating which parameters to use to
+        condition the model. 
+    m_index: int
+        Index of log(M/M_sun) in the list of parameters that were used
+        to fit the model.
+    X: array_like, shape = (n < n_features,)
+        Input data.
+    Xerr: array_like, shape = (X.shape,) (optional)
+        Error on input data. If none, no error used to condition.
 
-        Returns
-        -------
-        log_m: float
-            Sample value of log(M/M_sun) taken from the conditioned model.
+    Returns
+    -------
+    log_m: float
+        Sample value of log(M/M_sun) taken from the conditioned model.
 
-        Notes
-        -----
-        The fit_params array specifies a list of indices to use to
-        condition the model. The model will be conditioned and then
-        a mass will be drawn from the conditioned model.
+    Notes
+    -----
+    The fit_params array specifies a list of indices to use to
+    condition the model. The model will be conditioned and then
+    a mass will be drawn from the conditioned model.
 
-        This is so that the mass can be used to find cosmoDC2 galaxies
-        to act as hosts for OM10 systems.
+    This is so that the mass can be used to find cosmoDC2 galaxies
+    to act as hosts for OM10 systems.
 
-        This does not make assumptions about what parameters are being
-        used in the model, but does assume that the model has been
-        fit already.
+    This does not make assumptions about what parameters are being
+    used in the model, but does assume that the model has been
+    fit already.
     """
 
     if m_index in cond_indices:
